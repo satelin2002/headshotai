@@ -1,0 +1,5 @@
+mkdir -p src/app/(dashboard)
+mkdir -p src/app/(dashboard)/dashboard
+mkdir -p src/app/(dashboard)/settings
+mkdir -p src/app/(dashboard)/headshots
+mkdir -p src/app/(dashboard)/billing 

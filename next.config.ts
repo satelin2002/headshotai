@@ -1,7 +1,10 @@
-import type { NextConfig } from "next";
+import { config } from "process";
 
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    domains: ["images.unsplash.com"],
+  },
 };
 
 export default nextConfig;
