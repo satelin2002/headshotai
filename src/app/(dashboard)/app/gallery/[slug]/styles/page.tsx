@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 
 const STYLES = [
   {
@@ -138,7 +140,7 @@ const STYLES = [
 export default function StyleSelectionPage({
   params,
 }: {
-  params: { id: string };
+  params: { slug: string };
 }) {
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const router = useRouter();
@@ -159,7 +161,7 @@ export default function StyleSelectionPage({
     if (selectedStyles.length !== 2) return;
 
     try {
-      const response = await fetch(`/api/galleries/${params.id}/styles`, {
+      const response = await fetch(`/api/galleries/${params.slug}/styles`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ styles: selectedStyles }),
@@ -167,7 +169,7 @@ export default function StyleSelectionPage({
 
       if (!response.ok) throw new Error("Failed to update styles");
 
-      router.push(`/app/gallery/${params.id}`);
+      router.push(`/app/gallery/${params.slug}`);
     } catch (error) {
       console.error("Style selection error:", error);
     }
@@ -175,6 +177,16 @@ export default function StyleSelectionPage({
 
   return (
     <div className="container max-w-7xl mx-auto py-8 px-4 space-y-8">
+      <div className="flex items-center justify-between">
+        <Link
+          href="/app/create"
+          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors group"
+        >
+          <ChevronLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
+          <span>Start Over</span>
+        </Link>
+      </div>
+
       <div className="space-y-2">
         <h1 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
           Select Styles

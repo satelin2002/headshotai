@@ -18,6 +18,7 @@ CREATE TABLE "User" (
 CREATE TABLE "Gallery" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
     "status" "GalleryStatus" NOT NULL DEFAULT 'PROCESSING',
     "progress" INTEGER,
     "modelId" TEXT,
@@ -119,6 +120,9 @@ CREATE TABLE "ZipArchive" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Gallery_slug_key" ON "Gallery"("slug");
 
 -- CreateIndex
 CREATE INDEX "Gallery_userId_idx" ON "Gallery"("userId");

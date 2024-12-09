@@ -174,9 +174,40 @@ export default function CreateCollectionPage() {
     if (photos.length < 10) return;
 
     try {
+      // Check for existing collection first
+      const checkResponse = await fetch("/api/collections/check-title", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: title.trim() }),
+      });
+
+      const { exists } = await checkResponse.json();
+
+      if (exists) {
+        toast.warning(
+          "A collection with this name already exists. Creating a new one will replace the existing collection.",
+          {
+            action: {
+              label: "Continue anyway",
+              onClick: () => createCollection(),
+            },
+          }
+        );
+        return;
+      }
+
+      await createCollection();
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error("Failed to create collection. Please try again.");
+    }
+  };
+
+  const createCollection = async () => {
+    try {
       setIsSubmitting(true);
 
-      // Create zip file
+      // Move existing collection creation code here
       const zipFile = await createZipFile(photos);
       const formData = new FormData();
       formData.append("title", title);
@@ -194,21 +225,18 @@ export default function CreateCollectionPage() {
       });
 
       if (response.status === 401) {
-        // Redirect to login page with return URL
-        signIn(undefined, {
-          callbackUrl: window.location.href,
-        });
+        signIn(undefined, { callbackUrl: window.location.href });
         return;
       }
 
-      if (!response.ok) throw new Error("Failed to create collection");
+      const data = await response.json();
 
-      const collection = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create collection");
+      }
+
       toast.success("Collection created successfully!");
-      router.push(`/app/gallery/${collection.id}/styles`);
-    } catch (error) {
-      console.error("Submission error:", error);
-      toast.error("Failed to create collection. Please try again.");
+      router.push(`/app/gallery/${data.id}/styles`);
     } finally {
       setIsSubmitting(false);
     }

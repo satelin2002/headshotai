@@ -20,7 +20,7 @@ const mockPhotos = Array.from({ length: 50 }, (_, i) => ({
   formats: ["jpg", "png", "webp"],
 }));
 
-export default function GalleryPage({ params }: { params: { id: string } }) {
+export default function GalleryPage({ params }: { params: { slug: string } }) {
   const handleDownloadAll = () => {
     toast.info("Preparing ZIP file for download...");
     // Implement ZIP download logic
@@ -38,13 +38,13 @@ export default function GalleryPage({ params }: { params: { id: string } }) {
   return (
     <div className="container max-w-7xl mx-auto py-8 space-y-8">
       <div className="flex items-center justify-between">
+        ``
         <div className="space-y-1">
           <h1 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
             Professional LinkedIn Photos
           </h1>
           <p className="text-gray-400">50 photos • Created March 15, 2024</p>
         </div>
-
         <Button
           size="lg"
           onClick={handleDownloadAll}

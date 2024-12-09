@@ -30,6 +30,7 @@ model User {
 model Gallery {
   id          String        @id @default(cuid())
   title       String
+  slug        String        @unique
   status      GalleryStatus @default(PROCESSING)
   progress    Int?
   modelId     String?

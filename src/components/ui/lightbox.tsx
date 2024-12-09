@@ -26,11 +26,11 @@ export function Lightbox({
         {children}
       </div>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-6xl p-0 bg-transparent border-none [&>button]:text-white [&>button]:hover:text-white/80">
+        <DialogContent className="max-w-7xl p-0 bg-transparent border-none [&>button]:text-white [&>button]:hover:text-white/80">
           <VisuallyHidden asChild>
             <DialogTitle>{title}</DialogTitle>
           </VisuallyHidden>
-          <div className="relative aspect-[6/4]">
+          <div className="relative aspect-[6/3.3]">
             <Image
               src={image}
               alt={title}

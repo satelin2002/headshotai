@@ -3,20 +3,23 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export const POST = auth(async function POST(req, context) {
-  if (!req.auth?.user?.id || !context.params?.id) {
-    return new Response("Unauthorized", { status: 401 });
+  if (!req.auth?.user?.id || !context.params?.slug) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const { styles } = await req.json();
 
     if (!Array.isArray(styles) || styles.length !== 2) {
-      return new Response("Invalid styles selection", { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid styles selection" },
+        { status: 400 }
+      );
     }
 
     const gallery = await prisma.gallery.update({
       where: {
-        id: context.params.id as string,
+        slug: context.params.slug as string,
         userId: req.auth.user.id,
       },
       data: {
@@ -27,6 +30,9 @@ export const POST = auth(async function POST(req, context) {
     return NextResponse.json(gallery);
   } catch (error) {
     console.error("Style selection error:", error);
-    return new Response("Failed to update styles", { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update styles" },
+      { status: 500 }
+    );
   }
 });
