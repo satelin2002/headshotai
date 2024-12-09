@@ -3,7 +3,6 @@ import { Plus, CheckCircle2 } from "lucide-react";
 import { GalleryCard } from "@/components/gallery-card";
 import { PhotoStylesGrid } from "@/components/photo-styles-grid";
 import Link from "next/link";
-import { toast } from "react-hot-toast";
 
 // Add some mock data
 const mockGalleries = [
@@ -46,13 +45,7 @@ const mockGalleries = [
 ];
 
 export default function AppPage() {
-  const galleries = mockGalleries; // Replace the empty array with mock data
-
-  const handleRename = (galleryId: string, newTitle: string) => {
-    // Update gallery title in your backend
-    // For now, just show a toast
-    toast.success(`Gallery renamed to "${newTitle}"`);
-  };
+  const galleries: any[] = mockGalleries; // Replace the empty array with mock data
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-gray-950">
@@ -108,7 +101,6 @@ export default function AppPage() {
                   status={gallery.status}
                   progress={gallery.progress}
                   expiryDate={gallery.expiryDate}
-                  onRename={(newTitle) => handleRename(gallery.id, newTitle)}
                 />
               ))}
             </div>
