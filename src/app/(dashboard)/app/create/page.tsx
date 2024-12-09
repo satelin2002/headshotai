@@ -279,7 +279,9 @@ export default function CreateCollectionPage() {
             <div className="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium">
               1
             </div>
-            {/* <span className="text-blue-400 text-sm font-medium">Step 1</span> */}
+            <span className="text-blue-400 text-sm font-medium">
+              First Step
+            </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
             Create New Collection
@@ -539,9 +541,7 @@ export default function CreateCollectionPage() {
                         </li>
                         <li className="flex items-start gap-2">
                           <div className="h-5 w-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span className="text-xs text-emerald-400">
-                              ���
-                            </span>
+                            <span className="text-xs text-emerald-400">✓</span>
                           </div>
                           <span>
                             Mix different lighting conditions and backgrounds

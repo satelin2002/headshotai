@@ -6,10 +6,11 @@ import { ChevronLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { use } from "react";
+import { STYLES, type Style } from "@/lib/constants";
 
 export default function SummaryPage({
   params,
@@ -19,6 +20,13 @@ export default function SummaryPage({
   const resolvedParams = use(params) as { slug: string };
   const [isGenerating, setIsGenerating] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedStyles = searchParams.get("styles")?.split(",") || [];
+
+  // Find style details
+  const selectedStyleDetails = STYLES.filter((style: Style) =>
+    selectedStyles.includes(style.id)
+  );
 
   const handleGenerate = async () => {
     try {
@@ -130,23 +138,20 @@ export default function SummaryPage({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Style Preview Cards */}
-              {[1, 2].map((i) => (
-                <div key={i} className="flex gap-4 items-center">
+              {selectedStyleDetails.map((style) => (
+                <div key={style.id} className="flex gap-4 items-center">
                   <div className="relative aspect-[3/4] w-24 rounded-lg overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/20" />
                     <Image
-                      src="/examples/example.png"
-                      alt="Style preview"
+                      src={style.image}
+                      alt={style.name}
                       fill
                       className="object-cover"
                     />
                   </div>
                   <div>
-                    <h3 className="font-medium text-white">
-                      Professional Office
-                    </h3>
-                    <p className="text-sm text-gray-400">Corporate setting</p>
+                    <h3 className="font-medium text-white">{style.name}</h3>
+                    <p className="text-sm text-gray-400">Selected style</p>
                   </div>
                 </div>
               ))}

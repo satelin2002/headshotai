@@ -10,135 +10,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { use } from "react";
-
-const STYLES = [
-  {
-    id: "grey",
-    name: "Grey",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725592466/styles/grey-female_1.jpg",
-  },
-  {
-    id: "black",
-    name: "Black",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589489/styles/black-female.jpg",
-  },
-  {
-    id: "blue",
-    name: "Blue",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589489/styles/blue-female.jpg",
-  },
-  {
-    id: "cafe",
-    name: "Cafe",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589489/styles/cafe-female.jpg",
-  },
-  {
-    id: "office",
-    name: "Office",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589489/styles/office-female.jpg",
-  },
-  {
-    id: "outdoor",
-    name: "Outdoor",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589489/styles/outdoor-female.jpg",
-  },
-  {
-    id: "beach",
-    name: "Beach",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589489/styles/beach-female.jpg",
-  },
-  {
-    id: "city-skyline",
-    name: "City Skyline",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/city-female.jpg",
-  },
-  {
-    id: "street",
-    name: "Street",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/street-female.jpg",
-  },
-  {
-    id: "library",
-    name: "Library",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/library-female.jpg",
-  },
-  {
-    id: "city-lights",
-    name: "City Lights",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/city-light-female.jpg",
-  },
-  {
-    id: "stadium",
-    name: "Stadium",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/stadium-female.jpg",
-  },
-  {
-    id: "mountains",
-    name: "Mountains",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/mountain-female.jpg",
-  },
-  {
-    id: "sunset",
-    name: "Sunset",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/sunset-female.jpg",
-  },
-  {
-    id: "yacht",
-    name: "Yacht",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/yacht-female.jpg",
-  },
-  {
-    id: "art-piece",
-    name: "Art Piece",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/art-piece-female.jpg",
-  },
-  {
-    id: "realtor",
-    name: "Realtor",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/realtor-female.jpg",
-  },
-  {
-    id: "clinic-coat",
-    name: "Clinic Coat",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/clinic-coat-female.jpg",
-  },
-  {
-    id: "clinic-scrubs",
-    name: "Clinic Scrubs",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/clinic-scrubs-female.jpg",
-  },
-  {
-    id: "outdoor-hospital-coat",
-    name: "Outdoor Hospital Coat",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/outdoor-hospital-coat-female.jpg",
-  },
-  {
-    id: "outdoor-hospital-scrubs",
-    name: "Outdoor Hospital Scrubs",
-    image:
-      "https://res.cloudinary.com/duz3pqofn/image/upload/v1725589487/styles/outdoor-hospital-scrubs-female.jpg",
-  },
-] as const;
+import { STYLES } from "@/lib/constants";
+import { Loader2 } from "lucide-react";
 
 export default function StyleSelectionPage({
   params,
@@ -147,6 +20,7 @@ export default function StyleSelectionPage({
 }) {
   const resolvedParams = use(params) as { slug: string };
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const toggleStyle = (styleId: string) => {
@@ -165,6 +39,7 @@ export default function StyleSelectionPage({
     if (selectedStyles.length !== 2) return;
 
     try {
+      setIsSubmitting(true);
       const response = await fetch(
         `/api/galleries/${resolvedParams.slug}/styles`,
         {
@@ -176,10 +51,15 @@ export default function StyleSelectionPage({
 
       if (!response.ok) throw new Error("Failed to update styles");
 
-      router.push(`/app/gallery/${resolvedParams.slug}/summary`);
+      router.push(
+        `/app/gallery/${
+          resolvedParams.slug
+        }/summary?styles=${selectedStyles.join(",")}`
+      );
     } catch (error) {
       console.error("Style selection error:", error);
       toast.error("Failed to save styles. Please try again.");
+      setIsSubmitting(false);
     }
   };
 
@@ -201,7 +81,9 @@ export default function StyleSelectionPage({
             <div className="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium">
               2
             </div>
-            {/*  */}
+            <span className="text-blue-400 text-sm font-medium">
+              Second Step
+            </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
             Select Styles
@@ -217,11 +99,20 @@ export default function StyleSelectionPage({
             <Button
               onClick={handleSubmit}
               size="lg"
+              disabled={isSubmitting}
               className={cn(
-                "bg-gradient-to-r from-blue-400/90 via-violet-400/90 to-fuchsia-400/90 min-w-[200px] animate-pulse px-12"
+                "bg-gradient-to-r from-blue-400/90 via-violet-400/90 to-fuchsia-400/90 min-w-[200px]",
+                selectedStyles.length === 2 && "animate-pulse"
               )}
             >
-              Continue with Selected Styles
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Saving Styles...</span>
+                </div>
+              ) : (
+                "Start Generating Headshots"
+              )}
             </Button>
           )}
         </div>
