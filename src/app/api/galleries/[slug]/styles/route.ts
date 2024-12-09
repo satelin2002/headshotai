@@ -3,7 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export const POST = auth(async function POST(req, context) {
-  if (!req.auth?.user?.id || !context.params?.slug) {
+  const params = await context.params;
+  const slug = Array.isArray(params?.slug) ? params.slug[0] : params?.slug;
+
+  if (!req.auth?.user?.id || !slug) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -19,7 +22,7 @@ export const POST = auth(async function POST(req, context) {
 
     const gallery = await prisma.gallery.update({
       where: {
-        slug: context.params.slug as string,
+        slug: slug,
         userId: req.auth.user.id,
       },
       data: {

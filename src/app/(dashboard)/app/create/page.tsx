@@ -29,6 +29,7 @@ import Link from "next/link";
 import JSZip from "jszip";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { useDebounce } from "@/hooks/use-debounce";
 
 interface UploadedPhoto {
   id: string;
@@ -84,6 +85,9 @@ export default function CreateCollectionPage() {
   const [gender, setGender] = useState("");
   const [eyeColor, setEyeColor] = useState("");
   const [hairColor, setHairColor] = useState("");
+  const [isTitleChecking, setIsTitleChecking] = useState(false);
+  const [titleError, setTitleError] = useState<string | null>(null);
+  const debouncedTitle = useDebounce(title, 500);
 
   // Stop animation after 2 seconds
   useEffect(() => {
@@ -144,6 +148,7 @@ export default function CreateCollectionPage() {
     },
     maxSize: 120 * 1024 * 1024, // 120MB
     maxFiles: 20,
+    disabled: isSubmitting,
   });
 
   // Clean up object URLs on unmount
@@ -174,32 +179,12 @@ export default function CreateCollectionPage() {
     if (photos.length < 10) return;
 
     try {
-      // Check for existing collection first
-      const checkResponse = await fetch("/api/collections/check-title", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim() }),
-      });
-
-      const { exists } = await checkResponse.json();
-
-      if (exists) {
-        toast.warning(
-          "A collection with this name already exists. Creating a new one will replace the existing collection.",
-          {
-            action: {
-              label: "Continue anyway",
-              onClick: () => createCollection(),
-            },
-          }
-        );
-        return;
-      }
-
+      setIsSubmitting(true);
       await createCollection();
     } catch (error) {
       console.error("Submission error:", error);
       toast.error("Failed to create collection. Please try again.");
+      setIsSubmitting(false);
     }
   };
 
@@ -236,11 +221,44 @@ export default function CreateCollectionPage() {
       }
 
       toast.success("Collection created successfully!");
-      router.push(`/app/gallery/${data.id}/styles`);
+      router.push(`/app/gallery/${data.slug}/styles`);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    const checkTitle = async () => {
+      if (!debouncedTitle.trim()) {
+        setTitleError(null);
+        return;
+      }
+
+      setIsTitleChecking(true);
+      try {
+        const response = await fetch("/api/collections/check-title", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: debouncedTitle.trim() }),
+        });
+
+        const { exists } = await response.json();
+        if (exists) {
+          setTitleError(
+            "A collection with this name already exists. Creating a new one will replace the existing collection."
+          );
+        } else {
+          setTitleError(null);
+        }
+      } catch (error) {
+        console.error("Title check error:", error);
+      } finally {
+        setIsTitleChecking(false);
+      }
+    };
+
+    checkTitle();
+  }, [debouncedTitle]);
 
   return (
     <div className="container max-w-7xl px-4 mx-auto py-8 space-y-8">
@@ -256,9 +274,17 @@ export default function CreateCollectionPage() {
       </div>
 
       <div className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
-          Create New Collection
-        </h1>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-gradient-to-r from-blue-500/10 via-violet-500/10 to-fuchsia-500/10 rounded-full pl-2 pr-3 py-1">
+            <div className="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium">
+              1
+            </div>
+            {/* <span className="text-blue-400 text-sm font-medium">Step 1</span> */}
+          </div>
+          <h1 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
+            Create New Collection
+          </h1>
+        </div>
         <p className="text-gray-400">
           Fill in the details below to create your headshot collection
         </p>
@@ -276,6 +302,9 @@ export default function CreateCollectionPage() {
               >
                 Collection Name
                 <span className="text-red-400">*</span>
+                {isTitleChecking && (
+                  <Loader2 className="h-3 w-3 animate-spin ml-2" />
+                )}
               </Label>
               <Input
                 id="name"
@@ -283,7 +312,11 @@ export default function CreateCollectionPage() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Professional Headshots 2024"
                 className="bg-gray-900 border-gray-800 text-white"
+                disabled={isSubmitting}
               />
+              {titleError && (
+                <p className="text-amber-400 text-sm">{titleError}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -300,6 +333,7 @@ export default function CreateCollectionPage() {
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Your full name"
                 className="bg-gray-900 border-gray-800 text-white"
+                disabled={isSubmitting}
               />
             </div>
 
@@ -309,7 +343,11 @@ export default function CreateCollectionPage() {
                   Gender
                   <span className="text-red-400">*</span>
                 </Label>
-                <Select value={gender} onValueChange={setGender}>
+                <Select
+                  value={gender}
+                  onValueChange={setGender}
+                  disabled={isSubmitting}
+                >
                   <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
                     <SelectValue
                       placeholder="Select gender"
@@ -344,7 +382,11 @@ export default function CreateCollectionPage() {
                   Eye Color
                   <span className="text-red-400">*</span>
                 </Label>
-                <Select value={eyeColor} onValueChange={setEyeColor}>
+                <Select
+                  value={eyeColor}
+                  onValueChange={setEyeColor}
+                  disabled={isSubmitting}
+                >
                   <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
                     <SelectValue
                       placeholder="Select eye color"
@@ -370,7 +412,11 @@ export default function CreateCollectionPage() {
                   Hair Color
                   <span className="text-red-400">*</span>
                 </Label>
-                <Select value={hairColor} onValueChange={setHairColor}>
+                <Select
+                  value={hairColor}
+                  onValueChange={setHairColor}
+                  disabled={isSubmitting}
+                >
                   <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
                     <SelectValue
                       placeholder="Select hair color"
@@ -645,6 +691,7 @@ export default function CreateCollectionPage() {
                     <button
                       onClick={() => removePhoto(photo.id)}
                       className="absolute top-2 right-2 p-1.5 rounded-full bg-gray-900/80 text-gray-400 hover:text-white hover:bg-gray-900 hover:scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+                      disabled={isSubmitting}
                     >
                       <X className="h-4 w-4" />
                     </button>
