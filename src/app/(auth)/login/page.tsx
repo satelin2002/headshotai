@@ -1,21 +1,44 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { FcGoogle } from "react-icons/fc";
+import { FaLinkedin } from "react-icons/fa";
+import { Loader2 } from "lucide-react";
+import Image from "next/image";
+
 import {
   TypographyH3,
   TypographyMuted,
   TypographyLarge,
   TypographySmall,
 } from "@/components/ui/typography";
-import Image from "next/image";
-import Link from "next/link";
-import { FcGoogle } from "react-icons/fc";
-import { FaLinkedin } from "react-icons/fa";
 import { CheckCircle2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function LoginPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
+  const router = useRouter();
+
+  async function handleOAuthSignIn(provider: "google" | "linkedin") {
+    setIsLoading(true);
+    try {
+      await signIn(provider, {
+        callbackUrl: "/app",
+      });
+    } catch (error) {
+      console.error(`${provider} authentication error:`, error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   const features = [
     {
       text: "Money back ",
@@ -69,7 +92,7 @@ export default function LoginPage() {
       </div>
 
       <Card className="w-full max-w-md relative bg-gray-900/50 border-gray-800">
-        <CardContent className="pt-6 space-y-2">
+        <CardContent className="pt-6 space-y-4">
           <div className="space-y-4 mb-4">
             <TypographyH3 className="text-center tracking-tight text-white">
               Welcome back
@@ -82,23 +105,29 @@ export default function LoginPage() {
           <Button
             variant="outline"
             className="w-full h-12 font-semibold bg-white hover:bg-gray-100 text-gray-900 transition-all border-gray-200"
-            asChild
+            onClick={() => handleOAuthSignIn("google")}
+            disabled={isLoading}
           >
-            <Link href="/api/auth/google">
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
               <FcGoogle className="mr-2 h-8 w-8" />
-              Sign in with Google
-            </Link>
+            )}
+            Sign in with Google
           </Button>
 
           <Button
             variant="outline"
             className="w-full h-12 font-semibold bg-[#0077B5] hover:bg-[#006399] hover:text-white transition-all text-white border-[#0077B5]"
-            asChild
+            onClick={() => handleOAuthSignIn("linkedin")}
+            disabled={isLoading}
           >
-            <Link href="/api/auth/linkedin">
-              <FaLinkedin className="mr-2 h-8 w-8 text-white " />
-              Sign in with LinkedIn
-            </Link>
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin text-white" />
+            ) : (
+              <FaLinkedin className="mr-2 h-8 w-8 text-white" />
+            )}
+            Sign in with LinkedIn
           </Button>
 
           <div className="relative">
@@ -115,30 +144,43 @@ export default function LoginPage() {
               type="email"
               placeholder="Enter your email"
               className="h-12 bg-gray-900 border-gray-800 text-white placeholder:text-gray-500"
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              disabled={isLoading}
             />
             <Button
               variant="outline"
               className="w-full h-12 font-semibold bg-gray-900 hover:bg-gray-800 hover:text-white text-gray-300 border-gray-700 transition-all"
-              asChild
+              disabled={isLoading || !emailInput.trim()}
+              onClick={() =>
+                signIn("email", {
+                  email: emailInput,
+                  callbackUrl: "/dashboard",
+                })
+              }
             >
-              <Link href="/login/email">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mr-2"
-                >
-                  <rect width="20" height="16" x="2" y="4" rx="2" />
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                </svg>
-                Continue with Email
-              </Link>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-2"
+                  >
+                    <rect width="20" height="16" x="2" y="4" rx="2" />
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                  </svg>
+                  Continue with Email
+                </>
+              )}
             </Button>
           </div>
 

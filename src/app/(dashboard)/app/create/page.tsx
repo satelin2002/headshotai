@@ -10,11 +10,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { CloudUpload, Image as ImageIcon, X } from "lucide-react";
+import { CloudUpload, Image as ImageIcon, Loader2, X } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { useDropzone } from "react-dropzone";
+import { FileError, useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { Lightbox } from "@/components/ui/lightbox";
 import { Info } from "lucide-react";
@@ -26,6 +26,9 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import JSZip from "jszip";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 interface UploadedPhoto {
   id: string;
@@ -35,9 +38,52 @@ interface UploadedPhoto {
 
 const examplePhotos = ["/examples/example.png"];
 
+const HAIR_COLORS = [
+  "black",
+  "brown",
+  "blonde",
+  "red",
+  "auburn",
+  "gray",
+  "white",
+  "blue",
+  "green",
+  "pink",
+  "purple",
+  "silver",
+  "platinum-blonde",
+  "teal",
+  "lavender",
+  "orange",
+  "pastel",
+  "neon",
+  "ombre",
+  "multicolored",
+] as const;
+
+const EYE_COLORS = [
+  "brown",
+  "blue",
+  "green",
+  "hazel",
+  "amber",
+  "gray",
+  "violet",
+  "black",
+  "red",
+  "other",
+] as const;
+
 export default function CreateCollectionPage() {
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [isInitialAnimation, setIsInitialAnimation] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  const [title, setTitle] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [gender, setGender] = useState("");
+  const [eyeColor, setEyeColor] = useState("");
+  const [hairColor, setHairColor] = useState("");
 
   // Stop animation after 2 seconds
   useEffect(() => {
@@ -94,10 +140,10 @@ export default function CreateCollectionPage() {
     accept: {
       "image/jpeg": [".jpg", ".jpeg"],
       "image/png": [".png"],
-      "image/heic": [".heic"],
+      "image/webp": [".webp"],
     },
     maxSize: 120 * 1024 * 1024, // 120MB
-    maxFiles: 20, // Allow some buffer over 10
+    maxFiles: 20,
   });
 
   // Clean up object URLs on unmount
@@ -110,6 +156,63 @@ export default function CreateCollectionPage() {
       });
     };
   }, [photos]);
+
+  const createZipFile = async (photos: UploadedPhoto[]) => {
+    const zip = new JSZip();
+
+    for (const photo of photos) {
+      if (photo.file) {
+        zip.file(photo.file.name, photo.file);
+      }
+    }
+
+    return await zip.generateAsync({ type: "blob" });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (photos.length < 10) return;
+
+    try {
+      setIsSubmitting(true);
+
+      // Create zip file
+      const zipFile = await createZipFile(photos);
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("fullName", fullName);
+      formData.append("gender", gender);
+      formData.append("eyeColor", eyeColor);
+      formData.append("hairColor", hairColor);
+      formData.append("photoCount", photos.length.toString());
+      formData.append("zipFile", zipFile, "photos.zip");
+
+      // Submit to API
+      const response = await fetch("/api/collections", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.status === 401) {
+        // Redirect to login page with return URL
+        signIn(undefined, {
+          callbackUrl: window.location.href,
+        });
+        return;
+      }
+
+      if (!response.ok) throw new Error("Failed to create collection");
+
+      const collection = await response.json();
+      toast.success("Collection created successfully!");
+      router.push(`/app/gallery/${collection.id}/styles`);
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error("Failed to create collection. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="container max-w-7xl px-4 mx-auto py-8 space-y-8">
@@ -139,22 +242,34 @@ export default function CreateCollectionPage() {
           {/* Basic Information */}
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-gray-200">
+              <Label
+                htmlFor="name"
+                className="text-gray-200 flex items-center gap-1"
+              >
                 Collection Name
+                <span className="text-red-400">*</span>
               </Label>
               <Input
                 id="name"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Professional Headshots 2024"
                 className="bg-gray-900 border-gray-800 text-white"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-gray-200">
+              <Label
+                htmlFor="fullName"
+                className="text-gray-200 flex items-center gap-1"
+              >
                 Full Name
+                <span className="text-red-400">*</span>
               </Label>
               <Input
                 id="fullName"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 placeholder="Your full name"
                 className="bg-gray-900 border-gray-800 text-white"
               />
@@ -162,8 +277,11 @@ export default function CreateCollectionPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label className="text-gray-200">Gender</Label>
-                <Select>
+                <Label className="text-gray-200">
+                  Gender
+                  <span className="text-red-400">*</span>
+                </Label>
+                <Select value={gender} onValueChange={setGender}>
                   <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
                     <SelectValue
                       placeholder="Select gender"
@@ -194,8 +312,11 @@ export default function CreateCollectionPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-gray-200">Eye Color</Label>
-                <Select>
+                <Label className="text-gray-200">
+                  Eye Color
+                  <span className="text-red-400">*</span>
+                </Label>
+                <Select value={eyeColor} onValueChange={setEyeColor}>
                   <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
                     <SelectValue
                       placeholder="Select eye color"
@@ -203,73 +324,25 @@ export default function CreateCollectionPage() {
                     />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-900 border-gray-800">
-                    <SelectItem
-                      value="brown"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Brown
-                    </SelectItem>
-                    <SelectItem
-                      value="blue"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Blue
-                    </SelectItem>
-                    <SelectItem
-                      value="green"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Green
-                    </SelectItem>
-                    <SelectItem
-                      value="hazel"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Hazel
-                    </SelectItem>
-                    <SelectItem
-                      value="amber"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Amber
-                    </SelectItem>
-                    <SelectItem
-                      value="gray"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Gray
-                    </SelectItem>
-                    <SelectItem
-                      value="violet"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Violet
-                    </SelectItem>
-                    <SelectItem
-                      value="black"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Black
-                    </SelectItem>
-                    <SelectItem
-                      value="red"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Red
-                    </SelectItem>
-                    <SelectItem
-                      value="other"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Other
-                    </SelectItem>
+                    {EYE_COLORS.map((color) => (
+                      <SelectItem
+                        key={color}
+                        value={color}
+                        className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
+                      >
+                        {color.charAt(0).toUpperCase() + color.slice(1)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-gray-200">Hair Color</Label>
-                <Select>
+                <Label className="text-gray-200">
+                  Hair Color
+                  <span className="text-red-400">*</span>
+                </Label>
+                <Select value={hairColor} onValueChange={setHairColor}>
                   <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
                     <SelectValue
                       placeholder="Select hair color"
@@ -277,126 +350,16 @@ export default function CreateCollectionPage() {
                     />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-900 border-gray-800">
-                    <SelectItem
-                      value="black"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Black
-                    </SelectItem>
-                    <SelectItem
-                      value="brown"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Brown
-                    </SelectItem>
-                    <SelectItem
-                      value="blonde"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Blonde
-                    </SelectItem>
-                    <SelectItem
-                      value="red"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Red
-                    </SelectItem>
-                    <SelectItem
-                      value="auburn"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Auburn
-                    </SelectItem>
-                    <SelectItem
-                      value="gray"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Gray
-                    </SelectItem>
-                    <SelectItem
-                      value="white"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      White
-                    </SelectItem>
-                    <SelectItem
-                      value="blue"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Blue
-                    </SelectItem>
-                    <SelectItem
-                      value="green"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Green
-                    </SelectItem>
-                    <SelectItem
-                      value="pink"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Pink
-                    </SelectItem>
-                    <SelectItem
-                      value="purple"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Purple
-                    </SelectItem>
-                    <SelectItem
-                      value="silver"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Silver
-                    </SelectItem>
-                    <SelectItem
-                      value="platinum-blonde"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Platinum Blonde
-                    </SelectItem>
-                    <SelectItem
-                      value="teal"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Teal
-                    </SelectItem>
-                    <SelectItem
-                      value="lavender"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Lavender
-                    </SelectItem>
-                    <SelectItem
-                      value="orange"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Orange
-                    </SelectItem>
-                    <SelectItem
-                      value="pastel"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Pastel
-                    </SelectItem>
-                    <SelectItem
-                      value="neon"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Neon
-                    </SelectItem>
-                    <SelectItem
-                      value="ombre"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Ombre
-                    </SelectItem>
-                    <SelectItem
-                      value="multicolored"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
-                    >
-                      Multicolored
-                    </SelectItem>
+                    {HAIR_COLORS.map((color) => (
+                      <SelectItem
+                        key={color}
+                        value={color}
+                        className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
+                      >
+                        {color.charAt(0).toUpperCase() +
+                          color.slice(1).replace("-", " ")}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -406,11 +369,14 @@ export default function CreateCollectionPage() {
           {/* Photo Upload Section */}
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label className="text-gray-200">Upload Photos</Label>
+              <Label className="text-gray-200">
+                Upload Photos
+                <span className="text-red-400">*</span>
+              </Label>
               <p className="text-sm text-gray-400">
                 Select{" "}
                 <span className="font-semibold text-white bg-gradient-to-r from-blue-400/20 via-violet-400/20 to-fuchsia-400/20 px-2 py-0.5 rounded-md">
-                  at least 10
+                  at least 10 photos (required)
                 </span>{" "}
                 of your best photos. Good photos will result in amazing
                 headshots!
@@ -499,7 +465,9 @@ export default function CreateCollectionPage() {
                         </li>
                         <li className="flex items-start gap-2">
                           <div className="h-5 w-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span className="text-xs text-emerald-400">✓</span>
+                            <span className="text-xs text-emerald-400">
+                              ���
+                            </span>
                           </div>
                           <span>
                             Mix different lighting conditions and backgrounds
@@ -558,7 +526,7 @@ export default function CreateCollectionPage() {
                       : "Drag photos here or click to browse"}
                   </p>
                   <p className="text-sm text-gray-500 group-hover:text-gray-400 transition-colors duration-300">
-                    PNG, JPG, HEIC up to 120MB
+                    PNG, JPG, or WebP up to 120MB
                   </p>
                   <p className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors duration-300">
                     Upload can take up to 60 seconds
@@ -578,17 +546,45 @@ export default function CreateCollectionPage() {
 
           {/* Submit Button */}
           <div className="pt-4">
-            <Button
-              className="w-full bg-gradient-to-r from-blue-400/90 via-violet-400/90 to-fuchsia-400/90 hover:from-blue-500/90 hover:via-violet-500/90 hover:to-fuchsia-500/90 text-white font-medium h-11 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={photos.length < 10}
-            >
-              Create Collection
-            </Button>
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-400/90 via-violet-400/90 to-fuchsia-400/90 hover:from-blue-500/90 hover:via-violet-500/90 hover:to-fuchsia-500/90 text-white font-medium h-11"
+                disabled={
+                  isSubmitting ||
+                  photos.length < 10 ||
+                  !title.trim() ||
+                  !fullName.trim() ||
+                  !gender ||
+                  !eyeColor ||
+                  !hairColor
+                }
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Creating Collection...
+                  </div>
+                ) : (
+                  "Create Collection"
+                )}
+              </Button>
+            </form>
             {photos.length < 10 && (
               <p className="text-sm text-gray-400 text-center mt-2">
                 Upload {10 - photos.length} more photos to continue
               </p>
             )}
+            {photos.length >= 10 &&
+              (!title.trim() ||
+                !fullName.trim() ||
+                !gender ||
+                !eyeColor ||
+                !hairColor) && (
+                <p className="text-sm text-red-400 text-center mt-2">
+                  Please fill in all required fields marked with *
+                </p>
+              )}
           </div>
         </Card>
 

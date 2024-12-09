@@ -31,40 +31,43 @@ model Gallery {
   id          String        @id @default(cuid())
   title       String
   status      GalleryStatus @default(PROCESSING)
-  progress    Int?         
-  modelId     String?      
-  trainingId  String?      
-  triggerWord String?      
-  
+  progress    Int?
+  modelId     String?
+  trainingId  String?
+  triggerWord String?
+
   // Training data
-  zipUrl     String?      // S3 URL of the uploaded zip file
-  zipKey     String?      // S3 key of the uploaded zip file
-  photoCount Int          // Number of photos in the zip
-  
-  gender      String?
-  eyeColor    String?
-  hairColor   String?
-  
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  expiresAt   DateTime     
-  
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
+  zipUrl     String? // S3 URL of the uploaded zip file
+  zipKey     String? // S3 key of the uploaded zip file
+  photoCount Int // Number of photos in the zip
+
+  gender    String?
+  eyeColor  String?
+  hairColor String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
   generatedPhotos GeneratedPhoto[]
+  ZipArchive      ZipArchive?
+  fullName        String
+  selectedStyles  String[] @default([])
 
   @@index([userId])
 }
 
 model GeneratedPhoto {
-  id        String   @id @default(cuid())
-  url       String   // S3 URL
-  key       String   // S3 key
-  prompt    String   // The prompt used to generate this photo
-  
-  gallery   Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  url    String // S3 URL
+  key    String // S3 key
+  prompt String // The prompt used to generate this photo
+
+  gallery   Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
   galleryId String
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -134,16 +137,16 @@ model Authenticator {
 }
 
 model ZipArchive {
-  id        String   @id @default(cuid())
-  url       String   // S3 URL for the zip file
-  key       String   // S3 key for the zip file
-  size      Int      // Total size in bytes
-  fileCount Int      // Number of photos in zip
-  
+  id        String @id @default(cuid())
+  url       String // S3 URL for the zip file
+  key       String // S3 key for the zip file
+  size      Int // Total size in bytes
+  fileCount Int // Number of photos in zip
+
   // Relations
-  gallery   Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
-  galleryId String   @unique // Makes this a one-to-one relation
-  
+  gallery   Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  galleryId String  @unique // Makes this a one-to-one relation
+
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
