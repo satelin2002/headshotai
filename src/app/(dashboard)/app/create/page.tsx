@@ -19,6 +19,13 @@ import { toast } from "sonner";
 import { Lightbox } from "@/components/ui/lightbox";
 import { Info } from "lucide-react";
 import Image from "next/image";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@/components/ui/collapsible";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 
 interface UploadedPhoto {
   id: string;
@@ -106,6 +113,17 @@ export default function CreateCollectionPage() {
 
   return (
     <div className="container max-w-7xl px-4 mx-auto py-8 space-y-8">
+      {/* Back to Gallery Link */}
+      <div className="flex items-center justify-between">
+        <Link
+          href="/app"
+          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors group"
+        >
+          <ChevronLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
+          <span>Back to Gallery</span>
+        </Link>
+      </div>
+
       <div className="space-y-2">
         <h1 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
           Create New Collection
@@ -401,102 +419,118 @@ export default function CreateCollectionPage() {
 
             {/* Guidelines Card */}
             <Card className="p-6 border-gray-800 bg-gray-900/50">
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-blue-500/10 rounded-lg">
-                  <Info className="h-5 w-5 text-blue-400" />
-                </div>
-                <div className="space-y-6 flex-1">
-                  {/* Technical Requirements */}
-                  <div>
-                    <h3 className="text-sm font-medium text-white mb-3 flex items-center">
-                      Technical Requirements
-                      <span className="ml-2 text-xs text-blue-400/80 font-normal">
-                        For best quality results
-                      </span>
-                    </h3>
-                    <ul className="text-sm text-gray-400 space-y-2.5 list-none">
-                      <li className="flex items-start gap-2">
-                        <div className="h-5 w-5 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-xs text-blue-400">1</span>
-                        </div>
-                        <span>
-                          Use high-resolution photos (1024x1024 or higher
-                          recommended)
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="h-5 w-5 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-xs text-blue-400">2</span>
-                        </div>
-                        <span>Supported formats: WebP, JPG, or PNG</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="h-5 w-5 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-xs text-blue-400">3</span>
-                        </div>
-                        <span>
-                          Upload at least 10 different photos for best results
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Photo Tips */}
-                  <div>
-                    <h3 className="text-sm font-medium text-white mb-3 flex items-center">
-                      Photo Tips
-                      <span className="ml-2 text-xs text-emerald-400/80 font-normal">
-                        For natural variety
-                      </span>
-                    </h3>
-                    <ul className="text-sm text-gray-400 space-y-2.5 list-none">
-                      <li className="flex items-start gap-2">
-                        <div className="h-5 w-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-xs text-emerald-400">✓</span>
-                        </div>
-                        <span>
-                          Include different facial expressions and head angles
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="h-5 w-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-xs text-emerald-400">✓</span>
-                        </div>
-                        <span>Vary your clothing styles and colors</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="h-5 w-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-xs text-emerald-400">✓</span>
-                        </div>
-                        <span>
-                          Mix different lighting conditions and backgrounds
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Example Section */}
-                  <div className="space-y-3 pt-2">
-                    <h3 className="text-sm font-medium text-white flex items-center">
-                      Example Photos
-                      <span className="ml-2 text-xs text-gray-400 font-normal">
-                        Click to enlarge
-                      </span>
-                    </h3>
-                    <div className="w-full">
-                      <Lightbox
-                        className="aspect-[8/3] relative cursor-zoom-in group rounded-lg overflow-hidden"
-                        image={examplePhotos[0]}
-                      >
-                        <Image
-                          src={examplePhotos[0]}
-                          alt="Example training photo set showing variety in poses and settings"
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                      </Lightbox>
+              <div className="space-y-6">
+                {/* Technical Requirements & Photo Tips - Collapsible */}
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center gap-3 text-sm text-gray-400 hover:text-white w-full group">
+                    <div className="p-2 bg-gradient-to-r from-blue-500/10 via-violet-500/10 to-fuchsia-500/10 rounded-lg group-hover:from-blue-500/20 group-hover:via-violet-500/20 group-hover:to-fuchsia-500/20 transition-all duration-300">
+                      <Info className="h-4 w-4 text-blue-400" />
                     </div>
+                    <div className="flex items-center justify-between flex-1 py-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Photo Guidelines</span>
+                        <span className="text-xs text-blue-400/70">
+                          Click to expand
+                        </span>
+                      </div>
+                      <div className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full">
+                        Important
+                      </div>
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-4 pl-10 space-y-6">
+                    {/* Technical Requirements */}
+                    <div>
+                      <h3 className="text-sm font-medium text-white mb-3">
+                        Technical Requirements
+                        <span className="ml-2 text-xs text-blue-400/80 font-normal">
+                          For best quality results
+                        </span>
+                      </h3>
+                      <ul className="text-sm text-gray-400 space-y-2.5 list-none">
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-xs text-blue-400">1</span>
+                          </div>
+                          <span>
+                            Use high-resolution photos (1024x1024 or higher
+                            recommended)
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-xs text-blue-400">2</span>
+                          </div>
+                          <span>Supported formats: WebP, JPG, or PNG</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-xs text-blue-400">3</span>
+                          </div>
+                          <span>
+                            Upload at least 10 different photos for best results
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* Photo Tips */}
+                    <div>
+                      <h3 className="text-sm font-medium text-white mb-3">
+                        Photo Tips
+                        <span className="ml-2 text-xs text-emerald-400/80 font-normal">
+                          For natural variety
+                        </span>
+                      </h3>
+                      <ul className="text-sm text-gray-400 space-y-2.5 list-none">
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-xs text-emerald-400">✓</span>
+                          </div>
+                          <span>
+                            Include different facial expressions and head angles
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-xs text-emerald-400">✓</span>
+                          </div>
+                          <span>Vary your clothing styles and colors</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-xs text-emerald-400">✓</span>
+                          </div>
+                          <span>
+                            Mix different lighting conditions and backgrounds
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+
+                {/* Example Photos - Always Visible */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-medium text-white flex items-center">
+                    Example Photos
+                    <span className="ml-2 text-xs text-gray-400 font-normal">
+                      Click to enlarge
+                    </span>
+                  </h3>
+                  <div className="w-full">
+                    <Lightbox
+                      className="aspect-[8/3] relative cursor-zoom-in group rounded-lg overflow-hidden"
+                      image={examplePhotos[0]}
+                    >
+                      <Image
+                        src={examplePhotos[0]}
+                        alt="Example training photo set showing variety in poses and settings"
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                    </Lightbox>
                   </div>
                 </div>
               </div>
