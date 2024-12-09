@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { auth } from "./lib/auth";
 
 export default auth((req) => {
   const isAuthenticated = !!req.auth;
@@ -19,5 +19,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/api/posts/:path*", "/posts/:path*"],
+  matcher: ["/api/auth/:path*", "/login"],
 };

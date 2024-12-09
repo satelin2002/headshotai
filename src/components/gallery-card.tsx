@@ -62,7 +62,7 @@ export function GalleryCard({
   };
 
   return (
-    <Card className="group overflow-hidden bg-gray-900/50 border-gray-800 hover:border-gray-700 hover:bg-gray-900/70 transition-all duration-300">
+    <Card className="group overflow-hidden bg-gray-900/50 border-gray-800 hover:border-gray-700 hover:bg-gray-900/70 transition-all duration-300 flex flex-col">
       <div className="aspect-[4/3] relative bg-gray-800 overflow-hidden">
         {isProcessing ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4 p-4">
@@ -107,13 +107,13 @@ export function GalleryCard({
         )}
       </div>
 
-      <div className="p-4 space-y-4">
-        <div className="flex items-start justify-between">
+      <div className="p-4 flex flex-col flex-1">
+        <div className="flex items-start justify-between mb-auto">
           <div className="space-y-1">
-            <h3 className="font-medium text-white group-hover:text-blue-200 transition-colors duration-300">
+            <h3 className="font-medium text-white group-hover:text-blue-200 transition-colors duration-300 line-clamp-1">
               {title}
             </h3>
-            <div className="space-y-0.5">
+            <div>
               <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                 {isProcessing ? (
                   <span className="text-blue-400">Processing • {date}</span>
@@ -132,11 +132,6 @@ export function GalleryCard({
                   <span className="text-gray-500 ml-1">
                     • Expires {formatDate(expiryDate!)}
                   </span>
-                </p>
-              )}
-              {daysRemaining && daysRemaining <= 3 && !isProcessing && (
-                <p className="text-xs text-red-400">
-                  Download soon to avoid losing your photos
                 </p>
               )}
             </div>
@@ -183,26 +178,34 @@ export function GalleryCard({
           ) : null}
         </div>
 
-        {isProcessing ? (
-          <div className="w-full py-2 px-4 text-center bg-gray-800/50 border border-gray-800 rounded-md">
-            <p className="text-sm text-gray-400">
-              Processing your headshots...
-            </p>
-          </div>
-        ) : (
-          <Button
-            size="sm"
-            variant="outline"
-            className={cn(
-              "w-full bg-gray-800/50 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-700 transition-all duration-300",
-              daysRemaining &&
-                daysRemaining <= 3 &&
-                "border-amber-900/50 bg-amber-950/20 hover:bg-amber-950/30"
-            )}
-          >
-            View Gallery
-          </Button>
+        {daysRemaining && daysRemaining <= 3 && !isProcessing && (
+          <p className="text-xs text-red-400 mt-2">
+            Download soon to avoid losing your photos
+          </p>
         )}
+
+        <div className="mt-4">
+          {isProcessing ? (
+            <div className="w-full py-2 px-4 text-center bg-gray-800/50 border border-gray-800 rounded-md">
+              <p className="text-sm text-gray-400">
+                Processing your headshots...
+              </p>
+            </div>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              className={cn(
+                "w-full bg-gray-800/50 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-700 transition-all duration-300",
+                daysRemaining &&
+                  daysRemaining <= 3 &&
+                  "border-amber-900/50 bg-amber-950/20 hover:bg-amber-950/30"
+              )}
+            >
+              View Gallery
+            </Button>
+          )}
+        </div>
       </div>
     </Card>
   );
