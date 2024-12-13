@@ -1,8 +1,11 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { TypographyLarge } from "@/components/ui/typography";
 import { Globe, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import {
   Select,
   SelectContent,
@@ -81,6 +84,13 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="sm"
+              onClick={() =>
+                signOut({
+                  callbackUrl: "/",
+                  redirect: true,
+                  redirectTo: "/login",
+                })
+              }
               className="h-9 text-gray-300 hover:text-white hover:bg-gray-800/80 transition-colors"
             >
               <LogOut className="h-4 w-4" />

@@ -1,51 +1,47 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Plus, CheckCircle2 } from "lucide-react";
 import { GalleryCard } from "@/components/gallery-card";
 import { PhotoStylesGrid } from "@/components/photo-styles-grid";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { ModelStatus } from "@prisma/client";
 
-// Add some mock data
-const mockGalleries = [
-  {
-    id: "1",
-    title: "Professional LinkedIn Photos",
-    photoCount: 15,
-    thumbnail: "https://images.unsplash.com/photo-1560250097-0b93528c311a",
-    date: "March 15, 2024",
-    status: "ready" as const,
-    expiryDate: "2025-04-14",
-  },
-  {
-    id: "2",
-    title: "Corporate Team Headshots",
-    photoCount: 24,
-    date: "March 14, 2024",
-    status: "processing" as const,
-    progress: 65,
-    expiryDate: "2024-04-13",
-  },
-  {
-    id: "3",
-    title: "Creative Portfolio Shots",
-    photoCount: 12,
-    thumbnail: "https://images.unsplash.com/photo-1600486913747-55e5470d6f40",
-    date: "March 10, 2024",
-    status: "ready" as const,
-    expiryDate: "2024-03-18",
-  },
-  {
-    id: "4",
-    title: "Executive Portraits",
-    photoCount: 18,
-    thumbnail: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-    date: "March 5, 2024",
-    status: "ready" as const,
-    expiryDate: "2024-04-14",
-  },
-];
+interface Model {
+  id: string;
+  title: string;
+  photoCount: number;
+  status: ModelStatus;
+  progress?: number;
+  createdAt: string;
+  expiresAt: string;
+  generatedPhotos: Array<{ url: string }>;
+}
 
 export default function AppPage() {
-  const galleries: any[] = mockGalleries; // Replace the empty array with mock data
+  const [models, setModels] = useState<Model[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchModels() {
+      try {
+        const response = await fetch("/api/models");
+        if (!response.ok) {
+          throw new Error("Failed to fetch models");
+        }
+        const data = [];
+        setModels(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load models");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchModels();
+  }, []);
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-gray-950">
@@ -66,10 +62,10 @@ export default function AppPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-2">
               <h2 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
-                Your Headshot Galleries
+                Your Models
               </h2>
               <p className="text-gray-400 text-sm md:text-base">
-                Create and manage multiple headshot collections
+                Create and manage multiple AI models
               </p>
             </div>
 
@@ -81,26 +77,41 @@ export default function AppPage() {
               <Link href="/app/create">
                 <div className="relative flex items-center">
                   <Plus className="mr-2 h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
-                  <span className="relative">New Headshot Collection</span>
+                  <span className="relative">New AI Model</span>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 via-violet-400/10 to-fuchsia-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </Link>
             </Button>
           </div>
 
-          {/* Gallery Grid or Empty State */}
-          {galleries.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {galleries.map((gallery) => (
+          {/* Model Grid or Empty State */}
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[300px] bg-gray-900/50 rounded-xl animate-pulse"
+                />
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-red-400 text-center py-8">{error}</div>
+          ) : models.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {models.map((model) => (
                 <GalleryCard
-                  key={gallery.id}
-                  title={gallery.title}
-                  photoCount={gallery.photoCount}
-                  thumbnail={gallery.thumbnail}
-                  date={gallery.date}
-                  status={gallery.status}
-                  progress={gallery.progress}
-                  expiryDate={gallery.expiryDate}
+                  key={model.id}
+                  title={model.title}
+                  photoCount={model.photoCount}
+                  thumbnail={model.generatedPhotos[0]?.url}
+                  date={new Date(model.createdAt).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                  status={model.status.toLowerCase() as any}
+                  progress={model.progress}
+                  expiryDate={model.expiresAt}
                 />
               ))}
             </div>
@@ -115,12 +126,12 @@ export default function AppPage() {
 
                 <div className="space-y-2">
                   <h3 className="text-xl font-semibold text-white">
-                    Create your headshot gallery
+                    Create your AI model
                   </h3>
-                  <p className="text-gray-400 max-w-sm">
-                    Start by creating a new headshot gallery. Each gallery can
-                    contain multiple professional headshots with different
-                    styles.
+                  <p className="text-gray-400 max-w-sm leading-relaxed">
+                    Create your own AI model to generate stunning professional
+                    portraits in any setting. Use custom prompts to bring your
+                    unique vision to life.
                   </p>
                 </div>
 
@@ -132,21 +143,19 @@ export default function AppPage() {
                   <Link href="/app/create">
                     <div className="relative flex items-center">
                       <Plus className="mr-2 h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
-                      Create your Headshot Collection
+                      Create your first AI Model
                     </div>
                   </Link>
                 </Button>
 
                 {/* Feature highlights */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl pt-8">
+                {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl pt-8">
                   <div className="flex flex-col items-center text-center space-y-2">
                     <CheckCircle2 className="h-5 w-5 text-green-400 shrink-0" />
                     <div>
-                      <p className="text-white font-medium">
-                        No studio required
-                      </p>
+                      <p className="text-white font-medium">AI Photographer</p>
                       <p className="text-sm text-gray-400">
-                        Get it done from home or office
+                        Take photos from your laptop or phone
                       </p>
                     </div>
                   </div>
@@ -154,29 +163,29 @@ export default function AppPage() {
                     <CheckCircle2 className="h-5 w-5 text-green-400 shrink-0" />
                     <div>
                       <p className="text-white font-medium">
-                        Professional quality
+                        100% AI Generated
                       </p>
                       <p className="text-sm text-gray-400">
-                        AI-powered photo enhancement
+                        Photos and videos in any pose or place
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-col items-center text-center space-y-2">
                     <CheckCircle2 className="h-5 w-5 text-green-400 shrink-0" />
                     <div>
-                      <p className="text-white font-medium">Save money</p>
+                      <p className="text-white font-medium">Try on clothes</p>
                       <p className="text-sm text-gray-400">
-                        8x cheaper than a photoshoot
+                        Virtual fitting for your Shopify store
                       </p>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           )}
 
-          {/* Only show example styles when there are no galleries */}
-          {galleries.length === 0 && (
+          {/* Only show example styles when there are no models */}
+          {/* {models.length === 0 && (
             <div className="space-y-6">
               <div className="space-y-2">
                 <h2 className="text-xl md:text-2xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
@@ -193,7 +202,7 @@ export default function AppPage() {
                 <PhotoStylesGrid />
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

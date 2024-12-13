@@ -10,7 +10,7 @@ export const POST = auth(async function POST(req) {
   try {
     const { title } = await req.json();
 
-    const existingCollection = await prisma.gallery.findFirst({
+    const existingModel = await prisma.model.findFirst({
       where: {
         userId: req.auth.user.id,
         title: title.trim(),
@@ -18,7 +18,7 @@ export const POST = auth(async function POST(req) {
       },
     });
 
-    return NextResponse.json({ exists: !!existingCollection });
+    return NextResponse.json({ exists: !!existingModel });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to check title" },

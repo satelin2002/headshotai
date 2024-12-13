@@ -10,7 +10,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { CloudUpload, Image as ImageIcon, Loader2, X } from "lucide-react";
+import {
+  CloudUpload,
+  Image as ImageIcon,
+  Loader2,
+  Sparkles,
+  X,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
@@ -30,6 +36,8 @@ import JSZip from "jszip";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useDebounce } from "@/hooks/use-debounce";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface UploadedPhoto {
   id: string;
@@ -75,7 +83,18 @@ const EYE_COLORS = [
   "other",
 ] as const;
 
-export default function CreateCollectionPage() {
+const ETHNICITIES = [
+  { value: "ASIAN", label: "Asian" },
+  { value: "BLACK", label: "Black" },
+  { value: "HISPANIC", label: "Hispanic" },
+  { value: "MIDDLE_EASTERN", label: "Middle Eastern" },
+  { value: "WHITE", label: "White" },
+  { value: "PACIFIC_ISLANDER", label: "Pacific Islander" },
+  { value: "MIXED", label: "Mixed" },
+  { value: "OTHER", label: "Other" },
+] as const;
+
+export default function CreateModelPage() {
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [isInitialAnimation, setIsInitialAnimation] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,6 +107,9 @@ export default function CreateCollectionPage() {
   const [isTitleChecking, setIsTitleChecking] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
   const debouncedTitle = useDebounce(title, 500);
+  const [age, setAge] = useState<number>(0);
+  const [ethnicity, setEthnicity] = useState("");
+  const [ageError, setAgeError] = useState<string | null>(null);
 
   // Stop animation after 2 seconds
   useEffect(() => {
@@ -174,25 +196,21 @@ export default function CreateCollectionPage() {
     return await zip.generateAsync({ type: "blob" });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (photos.length < 10) return;
-
-    try {
-      setIsSubmitting(true);
-      await createCollection();
-    } catch (error) {
-      console.error("Submission error:", error);
-      toast.error("Failed to create collection. Please try again.");
-      setIsSubmitting(false);
+  const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    setAge(value);
+    if (value < 18) {
+      setAgeError("Must be 18 or above");
+    } else {
+      setAgeError(null);
     }
   };
 
-  const createCollection = async () => {
+  const createModel = async () => {
     try {
       setIsSubmitting(true);
 
-      // Move existing collection creation code here
+      // Move existing model creation code here
       const zipFile = await createZipFile(photos);
       const formData = new FormData();
       formData.append("title", title);
@@ -200,11 +218,13 @@ export default function CreateCollectionPage() {
       formData.append("gender", gender);
       formData.append("eyeColor", eyeColor);
       formData.append("hairColor", hairColor);
+      formData.append("age", age.toString());
+      formData.append("ethnicity", ethnicity);
       formData.append("photoCount", photos.length.toString());
       formData.append("zipFile", zipFile, "photos.zip");
 
       // Submit to API
-      const response = await fetch("/api/collections", {
+      const response = await fetch("/api/models", {
         method: "POST",
         body: formData,
       });
@@ -217,12 +237,31 @@ export default function CreateCollectionPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to create collection");
+        throw new Error(data.error || "Failed to create model");
       }
 
-      toast.success("Collection created successfully!");
-      router.push(`/app/gallery/${data.slug}/styles`);
+      toast.success(
+        "Your model is being generated! We'll notify you by email once it's ready.",
+        {
+          duration: 5000,
+        }
+      );
+      router.push(`/app`);
     } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (photos.length < 12 || age < 18) return;
+
+    try {
+      setIsSubmitting(true);
+      await createModel();
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error("Failed to create model. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -236,7 +275,7 @@ export default function CreateCollectionPage() {
 
       setIsTitleChecking(true);
       try {
-        const response = await fetch("/api/collections/check-title", {
+        const response = await fetch("/api/models/check-title", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ title: debouncedTitle.trim() }),
@@ -245,7 +284,7 @@ export default function CreateCollectionPage() {
         const { exists } = await response.json();
         if (exists) {
           setTitleError(
-            "A collection with this name already exists. Creating a new one will replace the existing collection."
+            "A model with this name already exists. Creating a new one will replace the existing model."
           );
         } else {
           setTitleError(null);
@@ -262,33 +301,23 @@ export default function CreateCollectionPage() {
 
   return (
     <div className="container max-w-7xl px-4 mx-auto py-8 space-y-8">
-      {/* Back to Gallery Link */}
+      {/* Back to Models Link */}
       <div className="flex items-center justify-between">
         <Link
           href="/app"
           className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors group"
         >
           <ChevronLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
-          <span>Back to Gallery</span>
+          <span>Back to Models</span>
         </Link>
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-gradient-to-r from-blue-500/10 via-violet-500/10 to-fuchsia-500/10 rounded-full pl-2 pr-3 py-1">
-            <div className="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium">
-              1
-            </div>
-            <span className="text-blue-400 text-sm font-medium">
-              First Step
-            </span>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
-            Create New Collection
-          </h1>
-        </div>
+        <h1 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
+          Create New Model
+        </h1>
         <p className="text-gray-400">
-          Fill in the details below to create your headshot collection
+          Fill in the details below to create your custom AI model
         </p>
       </div>
 
@@ -302,7 +331,7 @@ export default function CreateCollectionPage() {
                 htmlFor="name"
                 className="text-gray-200 flex items-center gap-1"
               >
-                Collection Name
+                Model Name
                 <span className="text-red-400">*</span>
                 {isTitleChecking && (
                   <Loader2 className="h-3 w-3 animate-spin ml-2" />
@@ -381,6 +410,36 @@ export default function CreateCollectionPage() {
 
               <div className="space-y-2">
                 <Label className="text-gray-200">
+                  Ethnicity
+                  <span className="text-red-400">*</span>
+                </Label>
+                <Select
+                  value={ethnicity}
+                  onValueChange={setEthnicity}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
+                    <SelectValue
+                      placeholder="Select ethnicity"
+                      className="text-gray-400"
+                    />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-900 border-gray-800">
+                    {ETHNICITIES.map((item) => (
+                      <SelectItem
+                        key={item.value}
+                        value={item.value}
+                        className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
+                      >
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-gray-200">
                   Eye Color
                   <span className="text-red-400">*</span>
                 </Label>
@@ -439,6 +498,36 @@ export default function CreateCollectionPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label className="text-gray-200">
+                  Age
+                  <span className="text-red-400">*</span>
+                  <span className="text-xs text-gray-400 ml-2">
+                    (18 or above)
+                  </span>
+                </Label>
+                <div className="space-y-2">
+                  <Input
+                    type="number"
+                    value={age || ""}
+                    onChange={handleAgeChange}
+                    max={100}
+                    className={cn(
+                      "bg-gray-900 border-gray-800 text-white",
+                      ageError && "border-red-500/50 focus:border-red-500"
+                    )}
+                    disabled={isSubmitting}
+                    placeholder="Enter age (18+)"
+                  />
+                  {ageError && (
+                    <div className="flex items-center gap-2 text-red-400 text-sm">
+                      <div className="h-1 w-1 rounded-full bg-red-400" />
+                      <span>{ageError}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -452,7 +541,7 @@ export default function CreateCollectionPage() {
               <p className="text-sm text-gray-400">
                 Select{" "}
                 <span className="font-semibold text-white bg-gradient-to-r from-blue-400/20 via-violet-400/20 to-fuchsia-400/20 px-2 py-0.5 rounded-md">
-                  at least 10 photos (required)
+                  at least 12 photos (required)
                 </span>{" "}
                 of your best photos. Good photos will result in amazing
                 headshots!
@@ -460,7 +549,7 @@ export default function CreateCollectionPage() {
             </div>
 
             {/* Guidelines Card */}
-            <Card className="p-6 border-gray-800 bg-gray-900/50">
+            <Card className="border-none bg-gray-900/50">
               <div className="space-y-6">
                 {/* Technical Requirements & Photo Tips - Collapsible */}
                 <Collapsible>
@@ -626,35 +715,43 @@ export default function CreateCollectionPage() {
                 className="w-full bg-gradient-to-r from-blue-400/90 via-violet-400/90 to-fuchsia-400/90 hover:from-blue-500/90 hover:via-violet-500/90 hover:to-fuchsia-500/90 text-white font-medium h-11"
                 disabled={
                   isSubmitting ||
-                  photos.length < 10 ||
+                  photos.length < 12 ||
                   !title.trim() ||
                   !fullName.trim() ||
                   !gender ||
                   !eyeColor ||
-                  !hairColor
+                  !hairColor ||
+                  !ethnicity ||
+                  age < 18
                 }
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Creating Collection...
+                    Creating Model (this will take a few seconds)...
                   </div>
                 ) : (
-                  "Create Collection"
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    Create Model
+                  </div>
                 )}
               </Button>
             </form>
-            {photos.length < 10 && (
+            {photos.length < 12 && (
               <p className="text-sm text-gray-400 text-center mt-2">
-                Upload {10 - photos.length} more photos to continue
+                Upload {12 - photos.length} more photos to continue. It will
+                take about 60 seconds to upload.
               </p>
             )}
-            {photos.length >= 10 &&
+            {photos.length >= 12 &&
               (!title.trim() ||
                 !fullName.trim() ||
                 !gender ||
                 !eyeColor ||
-                !hairColor) && (
+                !hairColor ||
+                !ethnicity ||
+                age < 18) && (
                 <p className="text-sm text-red-400 text-center mt-2">
                   Please fill in all required fields marked with *
                 </p>
@@ -664,16 +761,34 @@ export default function CreateCollectionPage() {
 
         {/* Right Column - Photo Preview */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Photo Preview</h2>
-            <p className="text-sm text-gray-400">
-              {photos.length} photos selected
-            </p>
-          </div>
-
           <Card className="border-gray-800 bg-gray-900/50 p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">
+                Photo Preview
+              </h2>
+              <p className="text-sm">
+                <span className="text-gray-400">{photos.length}</span>
+                <span className="text-gray-400">/</span>
+                <span
+                  className={cn(
+                    "font-semibold",
+                    photos.length >= 12
+                      ? "text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded"
+                      : "text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded"
+                  )}
+                >
+                  12
+                </span>
+                <span className="text-gray-400 ml-1">photos selected</span>
+                {photos.length < 12 && (
+                  <span className="text-amber-400 font-medium ml-1 bg-amber-400/10 px-2 py-0.5 rounded">
+                    ({12 - photos.length} more needed)
+                  </span>
+                )}
+              </p>
+            </div>
             {photos.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 {photos.map((photo) => (
                   <div
                     key={photo.id}

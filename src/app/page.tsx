@@ -1,119 +1,134 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { ChevronRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Camera, Users, Sparkles } from "lucide-react";
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b">
-        <div className="container flex h-16 items-center justify-between">
+    <div className="flex flex-col min-h-screen">
+      {/* Header */}
+      <header className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm supports-[backdrop-filter]:bg-gray-900/50">
+        <div className="container max-w-7xl mx-auto h-16 flex items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <Camera className="h-6 w-6" />
-            <span className="text-xl font-bold">AI Headshot Studio</span>
+            <Image
+              src="/logo.svg"
+              alt="HeadshotPro Logo"
+              width={28}
+              height={28}
+              className="shrink-0"
+            />
+            <span className="font-semibold text-white">HeadshotPro</span>
           </div>
-          <nav className="flex items-center gap-4">
-            <Link
-              href="/pricing"
-              className="text-sm font-medium hover:underline"
-            >
-              Pricing
+          <div className="flex items-center gap-4">
+            <Link href="/login">
+              <Button
+                variant="ghost"
+                className="text-gray-300 hover:text-white"
+              >
+                Login
+              </Button>
             </Link>
-            <Link
-              href="/enterprise"
-              className="text-sm font-medium hover:underline"
-            >
-              Enterprise
+            <Link href="/signup">
+              <Button className="bg-gradient-to-r from-blue-400/90 via-violet-400/90 to-fuchsia-400/90 hover:from-blue-500/90 hover:via-violet-500/90 hover:to-fuchsia-500/90 text-white">
+                Sign Up
+              </Button>
             </Link>
-            <Button variant="outline" asChild>
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/signup">Get Started</Link>
-            </Button>
-          </nav>
+          </div>
         </div>
       </header>
 
-      <main className="flex-1">
-        <section className="container space-y-6 py-24 sm:py-32">
-          <div className="mx-auto flex max-w-[64rem] flex-col items-center gap-4 text-center">
-            <h1 className="text-4xl font-bold sm:text-6xl">
-              Professional Headshots,{" "}
-              <span className="text-primary">Powered by AI</span>
-            </h1>
-            <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-              Generate stunning professional headshots in minutes. Perfect for
-              LinkedIn, company websites, and personal branding.
-            </p>
-            <div className="flex gap-4">
-              <Button size="lg" asChild>
-                <Link href="/create">
-                  Create Your Headshot <ArrowRight className="ml-2 h-4 w-4" />
+      {/* Hero Section */}
+      <main className="flex-1 overflow-hidden">
+        <div className="container max-w-7xl mx-auto px-4 py-16 md:py-24">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Left Column - Text */}
+            <div className="space-y-8">
+              <div className="space-y-6">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
+                  Train Your Personal AI Model
+                </h1>
+                <p className="text-lg md:text-xl text-gray-400 max-w-2xl">
+                  Create stunning professional headshots with our AI model.
+                  Upload your photos, select your styles, and get amazing
+                  results in minutes.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/signup">
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto bg-gradient-to-r from-blue-400/90 via-violet-400/90 to-fuchsia-400/90 hover:from-blue-500/90 hover:via-violet-500/90 hover:to-fuchsia-500/90 text-white"
+                  >
+                    Create Your Model
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
                 </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/enterprise">Enterprise Solution</Link>
-              </Button>
+                <Link href="/examples">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto border-gray-800 text-gray-300 hover:text-white hover:bg-gray-800/80"
+                  >
+                    View Examples
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Features List */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h3 className="text-white font-medium">Custom AI Model</h3>
+                  <p className="text-sm text-gray-400">
+                    Train a model on your photos for personalized results
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-white font-medium">Multiple Styles</h3>
+                  <p className="text-sm text-gray-400">
+                    Generate photos in various professional styles
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-white font-medium">Fast Training</h3>
+                  <p className="text-sm text-gray-400">
+                    Get your model trained and ready in 1-2 hours
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-white font-medium">Custom Prompts</h3>
+                  <p className="text-sm text-gray-400">
+                    Generate new photos with your own prompts
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Image */}
+            <div className="relative aspect-square lg:aspect-[4/3] rounded-xl overflow-hidden border border-gray-800 bg-gray-900/50">
+              <Image
+                src="/hero.png"
+                alt="AI Generated Headshots Examples"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/20 to-gray-900/0" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <p className="text-sm text-gray-400">
+                  Example outputs from our AI model
+                </p>
+              </div>
             </div>
           </div>
-        </section>
-
-        <section className="container py-12 sm:py-16">
-          <div className="grid gap-8 sm:grid-cols-3">
-            <Card>
-              <CardContent className="p-6">
-                <Camera className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  Professional Quality
-                </h3>
-                <p className="text-muted-foreground">
-                  AI-powered technology ensures consistent, high-quality results
-                  every time.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <Sparkles className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Instant Results</h3>
-                <p className="text-muted-foreground">
-                  Get your professional headshots in minutes, not days or weeks.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <Users className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Team Solutions</h3>
-                <p className="text-muted-foreground">
-                  Perfect for teams of any size, with enterprise-grade features.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
+        </div>
       </main>
 
-      <footer className="border-t py-6">
-        <div className="container flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <p className="text-sm text-muted-foreground">
-            © 2024 AI Headshot Studio. All rights reserved.
+      {/* Footer */}
+      <footer className="border-t border-gray-800 py-6">
+        <div className="container max-w-7xl mx-auto px-4">
+          <p className="text-sm text-gray-500 text-center">
+            © 2024 HeadshotPro. All rights reserved.
           </p>
-          <nav className="flex gap-4">
-            <Link
-              href="/privacy"
-              className="text-sm text-muted-foreground hover:underline"
-            >
-              Privacy
-            </Link>
-            <Link
-              href="/terms"
-              className="text-sm text-muted-foreground hover:underline"
-            >
-              Terms
-            </Link>
-          </nav>
         </div>
       </footer>
     </div>

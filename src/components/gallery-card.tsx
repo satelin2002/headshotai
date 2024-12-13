@@ -79,14 +79,11 @@ export function GalleryCard({
             </div>
             <div className="text-center space-y-1">
               <p className="text-sm font-medium text-gray-200">
-                Generating Your Headshots
+                Generating {title}
               </p>
               <p className="text-xs text-gray-400">
-                We'll notify you when they're ready
+                We'll notify you via email when they're ready
               </p>
-              {progress && (
-                <p className="text-xs text-blue-400">{progress}% Complete</p>
-              )}
             </div>
           </div>
         ) : thumbnail ? (
@@ -116,24 +113,11 @@ export function GalleryCard({
             <div>
               <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                 {isProcessing ? (
-                  <span className="text-blue-400">Processing • {date}</span>
+                  <span className="text-blue-400">{date}</span>
                 ) : (
-                  `${photoCount} photos • ${date}`
+                  `${date}`
                 )}
               </p>
-              {daysRemaining && daysRemaining > 0 && !isProcessing && (
-                <p className="text-xs flex items-center gap-1">
-                  <Clock className="h-3 w-3 text-amber-400" />
-                  <span className="text-amber-400">
-                    {daysRemaining === 1
-                      ? "1 day remaining"
-                      : `${daysRemaining} days remaining`}
-                  </span>
-                  <span className="text-gray-500 ml-1">
-                    • Expires {formatDate(expiryDate!)}
-                  </span>
-                </p>
-              )}
             </div>
           </div>
           {!isProcessing ? (
@@ -149,16 +133,13 @@ export function GalleryCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-48 bg-gray-900 border-gray-800"
+                className="w-58 bg-gray-900 border-gray-800"
               >
                 <DropdownMenuItem className="text-gray-300 hover:text-white focus:text-white focus:bg-gray-800">
                   <Download className="mr-2 h-4 w-4" />
-                  Download All
+                  Download All Saved Photos
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-gray-300 hover:text-white focus:text-white focus:bg-gray-800">
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share Gallery
-                </DropdownMenuItem>
+
                 <DropdownMenuItem className="text-gray-300 hover:text-white focus:text-white focus:bg-gray-800">
                   <Pencil className="mr-2 h-4 w-4" />
                   Rename
@@ -171,38 +152,29 @@ export function GalleryCard({
                 <DropdownMenuSeparator className="bg-gray-800" />
                 <DropdownMenuItem className="text-red-400 hover:text-red-300 focus:text-red-300 focus:bg-red-950/50">
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Gallery
+                  Delete Model
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : null}
         </div>
 
-        {daysRemaining && daysRemaining <= 3 && !isProcessing && (
+        {/* {daysRemaining && daysRemaining <= 3 && !isProcessing && (
           <p className="text-xs text-red-400 mt-2">
             Download soon to avoid losing your photos
           </p>
-        )}
+        )} */}
 
         <div className="mt-4">
-          {isProcessing ? (
-            <div className="w-full py-2 px-4 text-center bg-gray-800/50 border border-gray-800 rounded-md">
-              <p className="text-sm text-gray-400">
-                Processing your headshots...
-              </p>
-            </div>
-          ) : (
+          {isProcessing ? null : (
             <Button
               size="sm"
               variant="outline"
               className={cn(
-                "w-full bg-gray-800/50 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-700 transition-all duration-300",
-                daysRemaining &&
-                  daysRemaining <= 3 &&
-                  "border-amber-900/50 bg-amber-950/20 hover:bg-amber-950/30"
+                "w-full bg-gray-800/50 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-700 transition-all duration-300"
               )}
             >
-              View Gallery
+              Generate Photos from Model
             </Button>
           )}
         </div>

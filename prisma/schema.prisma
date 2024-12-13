@@ -21,30 +21,45 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  galleries     Gallery[]
+  models        Model[]
   Authenticator Authenticator[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 }
 
-model Gallery {
+enum Ethnicity {
+  ASIAN
+  BLACK
+  HISPANIC
+  MIDDLE_EASTERN
+  WHITE
+  PACIFIC_ISLANDER
+  MIXED
+  OTHER
+}
+
+model Model {
   id          String        @id @default(cuid())
   title       String
   slug        String        @unique
-  status      GalleryStatus @default(PROCESSING)
-  progress    Int?
-  modelId     String?
-  trainingId  String?
-  triggerWord String?
+  status      ModelStatus   @default(PROCESSING)
+  progress    Int?         // Training progress percentage
+  modelId     String?      // ID of the trained model
+  trainingId  String?      // ID of the training job
+  triggerWord String?      // Trigger word for the trained model
 
   // Training data
-  zipUrl     String? // S3 URL of the uploaded zip file
-  zipKey     String? // S3 key of the uploaded zip file
-  photoCount Int // Number of photos in the zip
+  zipUrl     String?      // S3 URL of the uploaded zip file
+  zipKey     String?      // S3 key of the uploaded zip file
+  photoCount Int          // Number of photos in the zip
 
-  gender    String?
-  eyeColor  String?
-  hairColor String?
+  // User details
+  fullName   String
+  age        Int          // Age of the person
+  ethnicity  Ethnicity    // Ethnicity of the person
+  gender     String?
+  eyeColor   String?
+  hairColor  String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -54,33 +69,53 @@ model Gallery {
   userId          String
   generatedPhotos GeneratedPhoto[]
   ZipArchive      ZipArchive?
-  fullName        String
-  selectedStyles  String[] @default([])
+  selectedStyles  PhotoStyle[]     // Selected styles for generation
 
   @@index([userId])
 }
 
-model GeneratedPhoto {
-  id     String @id @default(cuid())
-  url    String // S3 URL
-  key    String // S3 key
-  prompt String // The prompt used to generate this photo
+enum PhotoStyle {
+  PROFESSIONAL  // Professional Headshots
+  PROFILE       // Profile Picture
+  TRAVEL        // Travel Photos
+}
 
-  gallery   Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
-  galleryId String
+model GeneratedPhoto {
+  id        String     @id @default(cuid())
+  url       String     // S3 URL
+  key       String     // S3 key
+  prompt    String     // The prompt used to generate this photo
+  negative  String?    // Negative prompt used
+  seed      Int?      // Seed used for generation
+  steps     Int       @default(30)
+  cfg       Float     @default(7.5)
+  isCustom  Boolean   @default(false)  // Whether this was a custom generation vs auto
+  style     PhotoStyle? // Style category for the photo
+
+  // Image metadata
+  width     Int       // Width in pixels
+  height    Int       // Height in pixels
+  size      Int       // File size in bytes
+  format    String    // File format (jpg, png, etc)
+  megapixels Float    // Image resolution in megapixels
+  aspectRatio String  // Aspect ratio (e.g., "3:4", "1:1")
+
+  model     Model    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  modelId   String   // Renamed from aiModelId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([galleryId])
+  @@index([modelId])
 }
 
-enum GalleryStatus {
-  PROCESSING
-  GENERATING
-  READY
-  FAILED
-  EXPIRED
+enum ModelStatus {
+  PROCESSING    // Initial state when files are being processed
+  TRAINING      // Model is being trained
+  GENERATING    // Auto-generating initial set of photos
+  READY         // Model ready for custom prompts
+  FAILED        // Training or generation failed
+  EXPIRED       // Collection has expired
 }
 
 model Account {
@@ -141,12 +176,12 @@ model ZipArchive {
   id        String @id @default(cuid())
   url       String // S3 URL for the zip file
   key       String // S3 key for the zip file
-  size      Int // Total size in bytes
-  fileCount Int // Number of photos in zip
+  size      Int    // Total size in bytes
+  fileCount Int    // Number of photos in zip
 
   // Relations
-  gallery   Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
-  galleryId String  @unique // Makes this a one-to-one relation
+  model     Model  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  modelId   String @unique
 
   // Timestamps
   createdAt DateTime @default(now())

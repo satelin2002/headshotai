@@ -14,13 +14,10 @@ export async function validateUser(userId: string) {
 }
 
 /**
- * Checks if a user has reached their collection limit
+ * Checks if a user has reached their model limit
  */
-export async function checkUserCollectionLimit(
-  userId: string,
-  limit: number = 5
-) {
-  const activeCollections = await prisma.gallery.count({
+export async function checkUserModelLimit(userId: string, limit: number = 5) {
+  const activeModels = await prisma.model.count({
     where: {
       userId,
       status: {
@@ -32,32 +29,29 @@ export async function checkUserCollectionLimit(
     },
   });
 
-  if (activeCollections >= limit) {
-    throw new Error("Collection limit reached");
+  if (activeModels >= limit) {
+    throw new Error("Model limit reached");
   }
 
-  return activeCollections;
+  return activeModels;
 }
 
 /**
- * Checks if a user owns a specific collection
+ * Checks if a user owns a specific model
  */
-export async function validateCollectionOwnership(
-  userId: string,
-  collectionId: string
-) {
-  const collection = await prisma.gallery.findFirst({
+export async function validateModelOwnership(userId: string, modelId: string) {
+  const model = await prisma.model.findFirst({
     where: {
-      id: collectionId,
+      id: modelId,
       userId,
     },
   });
 
-  if (!collection) {
-    throw new Error("Collection not found or unauthorized");
+  if (!model) {
+    throw new Error("Model not found or unauthorized");
   }
 
-  return collection;
+  return model;
 }
 
 /**
@@ -81,16 +75,16 @@ export async function getUserLimits(userId: string) {
 }
 
 /**
- * Checks if collection has expired
+ * Checks if model has expired
  */
-export async function isCollectionExpired(collectionId: string) {
-  const collection = await prisma.gallery.findUnique({
-    where: { id: collectionId },
+export async function isModelExpired(modelId: string) {
+  const model = await prisma.model.findUnique({
+    where: { id: modelId },
   });
 
-  if (!collection) {
-    throw new Error("Collection not found");
+  if (!model) {
+    throw new Error("Model not found");
   }
 
-  return collection.expiresAt < new Date();
+  return model.expiresAt < new Date();
 }

@@ -1,5 +1,11 @@
 -- CreateEnum
-CREATE TYPE "GalleryStatus" AS ENUM ('PROCESSING', 'GENERATING', 'READY', 'FAILED', 'EXPIRED');
+CREATE TYPE "Ethnicity" AS ENUM ('ASIAN', 'BLACK', 'HISPANIC', 'MIDDLE_EASTERN', 'WHITE', 'PACIFIC_ISLANDER', 'MIXED', 'OTHER');
+
+-- CreateEnum
+CREATE TYPE "PhotoStyle" AS ENUM ('PROFESSIONAL', 'PROFILE', 'TRAVEL');
+
+-- CreateEnum
+CREATE TYPE "ModelStatus" AS ENUM ('PROCESSING', 'TRAINING', 'GENERATING', 'READY', 'FAILED', 'EXPIRED');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -15,11 +21,11 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
-CREATE TABLE "Gallery" (
+CREATE TABLE "Model" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
-    "status" "GalleryStatus" NOT NULL DEFAULT 'PROCESSING',
+    "status" "ModelStatus" NOT NULL DEFAULT 'PROCESSING',
     "progress" INTEGER,
     "modelId" TEXT,
     "trainingId" TEXT,
@@ -27,6 +33,9 @@ CREATE TABLE "Gallery" (
     "zipUrl" TEXT,
     "zipKey" TEXT,
     "photoCount" INTEGER NOT NULL,
+    "fullName" TEXT NOT NULL,
+    "age" INTEGER NOT NULL,
+    "ethnicity" "Ethnicity" NOT NULL,
     "gender" TEXT,
     "eyeColor" TEXT,
     "hairColor" TEXT,
@@ -34,10 +43,9 @@ CREATE TABLE "Gallery" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
-    "fullName" TEXT NOT NULL,
-    "selectedStyles" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "selectedStyles" "PhotoStyle"[],
 
-    CONSTRAINT "Gallery_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Model_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -46,7 +54,19 @@ CREATE TABLE "GeneratedPhoto" (
     "url" TEXT NOT NULL,
     "key" TEXT NOT NULL,
     "prompt" TEXT NOT NULL,
-    "galleryId" TEXT NOT NULL,
+    "negative" TEXT,
+    "seed" INTEGER,
+    "steps" INTEGER NOT NULL DEFAULT 30,
+    "cfg" DOUBLE PRECISION NOT NULL DEFAULT 7.5,
+    "isCustom" BOOLEAN NOT NULL DEFAULT false,
+    "style" "PhotoStyle",
+    "width" INTEGER NOT NULL,
+    "height" INTEGER NOT NULL,
+    "size" INTEGER NOT NULL,
+    "format" TEXT NOT NULL,
+    "megapixels" DOUBLE PRECISION NOT NULL,
+    "aspectRatio" TEXT NOT NULL,
+    "modelId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -111,7 +131,7 @@ CREATE TABLE "ZipArchive" (
     "key" TEXT NOT NULL,
     "size" INTEGER NOT NULL,
     "fileCount" INTEGER NOT NULL,
-    "galleryId" TEXT NOT NULL,
+    "modelId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -122,13 +142,13 @@ CREATE TABLE "ZipArchive" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Gallery_slug_key" ON "Gallery"("slug");
+CREATE UNIQUE INDEX "Model_slug_key" ON "Model"("slug");
 
 -- CreateIndex
-CREATE INDEX "Gallery_userId_idx" ON "Gallery"("userId");
+CREATE INDEX "Model_userId_idx" ON "Model"("userId");
 
 -- CreateIndex
-CREATE INDEX "GeneratedPhoto_galleryId_idx" ON "GeneratedPhoto"("galleryId");
+CREATE INDEX "GeneratedPhoto_modelId_idx" ON "GeneratedPhoto"("modelId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Session_sessionToken_key" ON "Session"("sessionToken");
@@ -137,13 +157,13 @@ CREATE UNIQUE INDEX "Session_sessionToken_key" ON "Session"("sessionToken");
 CREATE UNIQUE INDEX "Authenticator_credentialID_key" ON "Authenticator"("credentialID");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ZipArchive_galleryId_key" ON "ZipArchive"("galleryId");
+CREATE UNIQUE INDEX "ZipArchive_modelId_key" ON "ZipArchive"("modelId");
 
 -- AddForeignKey
-ALTER TABLE "Gallery" ADD CONSTRAINT "Gallery_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Model" ADD CONSTRAINT "Model_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "GeneratedPhoto" ADD CONSTRAINT "GeneratedPhoto_galleryId_fkey" FOREIGN KEY ("galleryId") REFERENCES "Gallery"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "GeneratedPhoto" ADD CONSTRAINT "GeneratedPhoto_modelId_fkey" FOREIGN KEY ("modelId") REFERENCES "Model"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -155,4 +175,4 @@ ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "Authenticator" ADD CONSTRAINT "Authenticator_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ZipArchive" ADD CONSTRAINT "ZipArchive_galleryId_fkey" FOREIGN KEY ("galleryId") REFERENCES "Gallery"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ZipArchive" ADD CONSTRAINT "ZipArchive_modelId_fkey" FOREIGN KEY ("modelId") REFERENCES "Model"("id") ON DELETE CASCADE ON UPDATE CASCADE;
