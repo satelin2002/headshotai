@@ -150,7 +150,7 @@ export default function LoginPage() {
             />
             <Button
               variant="outline"
-              className="w-full h-12 font-semibold bg-gray-900 hover:bg-gray-800 hover:text-white text-gray-300 border-gray-700 transition-all"
+              className="w-full h-12 font-semibold bg-gray-900/50 hover:bg-gray-800/80 hover:text-white text-gray-300 border-2 border-gray-500 transition-all"
               disabled={isLoading || !emailInput.trim()}
               onClick={() =>
                 signIn("email", {

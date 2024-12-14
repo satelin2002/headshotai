@@ -25,25 +25,29 @@ CREATE TABLE "Model" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
-    "status" "ModelStatus" NOT NULL DEFAULT 'PROCESSING',
-    "progress" INTEGER,
-    "modelId" TEXT,
-    "trainingId" TEXT,
-    "triggerWord" TEXT,
-    "zipUrl" TEXT,
-    "zipKey" TEXT,
-    "photoCount" INTEGER NOT NULL,
     "fullName" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "status" "ModelStatus" NOT NULL DEFAULT 'PROCESSING',
+    "gender" TEXT NOT NULL,
+    "eyeColor" TEXT NOT NULL,
+    "hairColor" TEXT NOT NULL,
     "age" INTEGER NOT NULL,
     "ethnicity" "Ethnicity" NOT NULL,
-    "gender" TEXT,
-    "eyeColor" TEXT,
-    "hairColor" TEXT,
+    "zipUrl" TEXT NOT NULL,
+    "zipKey" TEXT NOT NULL,
+    "photoCount" INTEGER NOT NULL,
+    "triggerWord" TEXT,
+    "coverImage" TEXT,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "expiresAt" TIMESTAMP(3) NOT NULL,
-    "userId" TEXT NOT NULL,
-    "selectedStyles" "PhotoStyle"[],
+    "trainingId" TEXT,
+    "trainingConfig" JSONB,
+    "replicateData" JSONB,
+    "trainingStatus" TEXT,
+    "trainingStarted" TIMESTAMP(3),
+    "trainingEnded" TIMESTAMP(3),
+    "progress" DOUBLE PRECISION,
 
     CONSTRAINT "Model_pkey" PRIMARY KEY ("id")
 );
@@ -146,6 +150,9 @@ CREATE UNIQUE INDEX "Model_slug_key" ON "Model"("slug");
 
 -- CreateIndex
 CREATE INDEX "Model_userId_idx" ON "Model"("userId");
+
+-- CreateIndex
+CREATE INDEX "Model_slug_idx" ON "Model"("slug");
 
 -- CreateIndex
 CREATE INDEX "GeneratedPhoto_modelId_idx" ON "GeneratedPhoto"("modelId");

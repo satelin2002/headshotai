@@ -2,11 +2,62 @@
 
 import { Button } from "@/components/ui/button";
 import { Plus, CheckCircle2 } from "lucide-react";
-import { GalleryCard } from "@/components/gallery-card";
-import { PhotoStylesGrid } from "@/components/photo-styles-grid";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ModelStatus } from "@prisma/client";
+import { ModelCard } from "@/components/model-card";
+
+// Add example models data
+const publicModels = [
+  {
+    id: "white-women",
+    title: "Professional White Woman",
+    photoCount: 50,
+    thumbnail: "/examples/white-woman.jpg",
+    date: "Featured Model",
+    status: "ready" as const,
+  },
+  {
+    id: "asian-women",
+    title: "Professional Asian Woman",
+    photoCount: 50,
+    thumbnail: "/examples/asian-woman.jpg",
+    date: "Featured Model",
+    status: "ready" as const,
+  },
+  {
+    id: "black-women",
+    title: "Professional Black Woman",
+    photoCount: 50,
+    thumbnail: "/examples/black-woman.jpg",
+    date: "Featured Model",
+    status: "ready" as const,
+  },
+  {
+    id: "white-man",
+    title: "Professional White Man",
+    photoCount: 50,
+    thumbnail: "/examples/white-man.jpg",
+    date: "Featured Model",
+    status: "ready" as const,
+  },
+  {
+    id: "asian-man",
+    title: "Professional Asian Man",
+    photoCount: 50,
+    thumbnail: "/examples/asian-man.jpg",
+    date: "Featured Model",
+    status: "ready" as const,
+  },
+  {
+    id: "black-man",
+    title: "Professional Black Man",
+    photoCount: 50,
+    thumbnail: "/examples/black-man.jpg",
+    date: "Featured Model",
+    status: "ready" as const,
+  },
+];
 
 interface Model {
   id: string;
@@ -16,6 +67,7 @@ interface Model {
   progress?: number;
   createdAt: string;
   expiresAt: string;
+  coverImage?: string;
   generatedPhotos: Array<{ url: string }>;
 }
 
@@ -31,7 +83,7 @@ export default function AppPage() {
         if (!response.ok) {
           throw new Error("Failed to fetch models");
         }
-        const data = [];
+        const data = await response.json();
         setModels(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load models");
@@ -84,7 +136,7 @@ export default function AppPage() {
             </Button>
           </div>
 
-          {/* Model Grid or Empty State */}
+          {/* Your Models Grid */}
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(4)].map((_, i) => (
@@ -99,11 +151,12 @@ export default function AppPage() {
           ) : models.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {models.map((model) => (
-                <GalleryCard
+                <ModelCard
                   key={model.id}
                   title={model.title}
                   photoCount={model.photoCount}
                   thumbnail={model.generatedPhotos[0]?.url}
+                  coverImage={model.coverImage}
                   date={new Date(model.createdAt).toLocaleDateString("en-US", {
                     month: "long",
                     day: "numeric",
@@ -184,25 +237,32 @@ export default function AppPage() {
             </div>
           )}
 
-          {/* Only show example styles when there are no models */}
-          {/* {models.length === 0 && (
+          {/* Public Example Models */}
+          {/* <div className="pt-12 border-t border-gray-800">
             <div className="space-y-6">
               <div className="space-y-2">
                 <h2 className="text-xl md:text-2xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
-                  Example Styles
+                  Public Models
                 </h2>
                 <p className="text-gray-400 text-sm md:text-base">
-                  Preview our collection of professional headshot styles. Each
-                  style is designed to match different professional contexts and
-                  preferences.
+                  Try our pre-trained professional models
                 </p>
               </div>
 
-              <div className="border rounded-xl p-6 md:p-8 bg-gray-900/50 border-gray-800">
-                <PhotoStylesGrid />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {publicModels.map((model) => (
+                  <GalleryCard
+                    key={model.id}
+                    title={model.title}
+                    photoCount={model.photoCount}
+                    thumbnail={model.thumbnail}
+                    status={model.status}
+                    date={model.date}
+                  />
+                ))}
               </div>
             </div>
-          )} */}
+          </div> */}
         </div>
       </div>
     </div>

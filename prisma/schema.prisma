@@ -38,40 +38,44 @@ enum Ethnicity {
   OTHER
 }
 
+// Add this before the Model type
+ 
+
 model Model {
-  id          String        @id @default(cuid())
-  title       String
-  slug        String        @unique
-  status      ModelStatus   @default(PROCESSING)
-  progress    Int?         // Training progress percentage
-  modelId     String?      // ID of the trained model
-  trainingId  String?      // ID of the training job
-  triggerWord String?      // Trigger word for the trained model
-
-  // Training data
-  zipUrl     String?      // S3 URL of the uploaded zip file
-  zipKey     String?      // S3 key of the uploaded zip file
-  photoCount Int          // Number of photos in the zip
-
-  // User details
-  fullName   String
-  age        Int          // Age of the person
-  ethnicity  Ethnicity    // Ethnicity of the person
-  gender     String?
-  eyeColor   String?
-  hairColor  String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  expiresAt DateTime
-
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId          String
-  generatedPhotos GeneratedPhoto[]
-  ZipArchive      ZipArchive?
-  selectedStyles  PhotoStyle[]     // Selected styles for generation
+  id                  String         @id @default(cuid())
+  title               String
+  slug                String        @unique
+  fullName            String
+  userId              String
+  status              ModelStatus   @default(PROCESSING)
+  gender              String
+  eyeColor            String
+  hairColor           String
+  age                 Int
+  ethnicity           Ethnicity
+  zipUrl              String
+  zipKey              String
+  photoCount          Int
+  triggerWord         String?
+  coverImage          String?
+  modelId             String?       // ID of the trained model
+  trainingErrorMessage String?      // Error message from training
+  expiresAt           DateTime
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  trainingId          String?
+  trainingConfig      Json?
+  replicateData       Json?
+  trainingStatus      String?
+  trainingStarted     DateTime?
+  trainingEnded       DateTime?
+  progress            Float?
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ZipArchive          ZipArchive?
+  generatedPhotos     GeneratedPhoto[]
 
   @@index([userId])
+  @@index([slug])
 }
 
 enum PhotoStyle {

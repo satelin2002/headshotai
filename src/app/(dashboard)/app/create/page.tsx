@@ -244,6 +244,10 @@ export default function CreateModelPage() {
         "Your model is being generated! We'll notify you by email once it's ready.",
         {
           duration: 5000,
+          style: {
+            maxWidth: "500px",
+            width: "100%",
+          },
         }
       );
       router.push(`/app`);
