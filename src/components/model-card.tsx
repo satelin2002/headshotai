@@ -73,6 +73,13 @@ export function ModelCard({
           subtext: "Please try again or contact support",
           color: "text-red-400",
         };
+      case "cancelled":
+        return {
+          icon: <XCircle className="h-8 w-8 text-amber-400" />,
+          text: "Training Cancelled",
+          subtext: "Training was cancelled",
+          color: "text-amber-400",
+        };
       case "ready":
         return {
           icon: <CheckCircle2 className="h-8 w-8 text-emerald-400" />,
@@ -111,7 +118,7 @@ export function ModelCard({
               src={coverImage || thumbnail!}
               alt={title}
               fill
-              className="object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
+              className="object-cover object-[50%_25%] transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-gray-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
@@ -152,17 +159,18 @@ export function ModelCard({
             <h3 className="font-medium text-white group-hover:text-blue-200 transition-colors duration-300 line-clamp-1">
               {title}
             </h3>
+            <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
+              {date}
+            </p>
             <div className="flex items-center gap-2">
-              <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
-                {date}
-              </p>
               <div
                 className={cn(
                   "h-1.5 w-1.5 rounded-full",
                   isReady && "bg-emerald-400",
                   isProcessing && "bg-blue-400",
                   isTraining && "bg-violet-400",
-                  isFailed && "bg-red-400"
+                  isFailed && "bg-red-400",
+                  status === "cancelled" && "bg-amber-400"
                 )}
               />
               <span
@@ -171,7 +179,8 @@ export function ModelCard({
                   isReady && "text-emerald-400",
                   isProcessing && "text-blue-400",
                   isTraining && "text-violet-400",
-                  isFailed && "text-red-400"
+                  isFailed && "text-red-400",
+                  status === "cancelled" && "text-amber-400"
                 )}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)}

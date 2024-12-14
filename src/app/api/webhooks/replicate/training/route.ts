@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
 
 export async function POST(req: Request) {
   try {
     console.log("[REPLICATE_WEBHOOK] Received webhook request");
     const payload = await req.json();
+
+    if (!payload || typeof payload !== "object") {
+      console.log("[REPLICATE_WEBHOOK] Invalid payload received:", payload);
+      return new NextResponse("Invalid payload", { status: 400 });
+    }
+
     const { status, id, output, error } = payload;
     console.log("[REPLICATE_WEBHOOK] Payload:", { status, id, output, error });
 
@@ -31,8 +36,6 @@ export async function POST(req: Request) {
     // Update model based on training status
     if (status === "completed") {
       console.log("[REPLICATE_WEBHOOK] Processing completed training");
-      const replicateData = model.replicateData as Prisma.JsonObject;
-      console.log("[REPLICATE_WEBHOOK] Updating model with completed status");
       await prisma.model.update({
         where: { id: model.id },
         data: {
@@ -40,19 +43,11 @@ export async function POST(req: Request) {
           modelId: output.model,
           trainingStatus: status,
           trainingEnded: new Date(),
-          replicateData: {
-            ...replicateData,
-            output,
-            status,
-            completed_at: new Date(),
-          },
         },
       });
       console.log("[REPLICATE_WEBHOOK] Model updated successfully");
     } else if (status === "failed") {
       console.log("[REPLICATE_WEBHOOK] Processing failed training");
-      const replicateData = model.replicateData as Prisma.JsonObject;
-      console.log("[REPLICATE_WEBHOOK] Updating model with failed status");
       await prisma.model.update({
         where: { id: model.id },
         data: {
@@ -60,15 +55,21 @@ export async function POST(req: Request) {
           trainingStatus: status,
           trainingErrorMessage: error || "Training failed",
           trainingEnded: new Date(),
-          replicateData: {
-            ...replicateData,
-            error,
-            status,
-            completed_at: new Date(),
-          },
         },
       });
       console.log("[REPLICATE_WEBHOOK] Model updated with failure status");
+    } else if (status === "canceled") {
+      console.log("[REPLICATE_WEBHOOK] Processing cancelled training");
+      await prisma.model.update({
+        where: { id: model.id },
+        data: {
+          status: "CANCELLED",
+          trainingStatus: status,
+          trainingErrorMessage: "Training was cancelled",
+          trainingEnded: new Date(),
+        },
+      });
+      console.log("[REPLICATE_WEBHOOK] Model updated with cancelled status");
     }
 
     console.log("[REPLICATE_WEBHOOK] Webhook processed successfully");

@@ -229,7 +229,8 @@ export const POST = auth(async function POST(req) {
     console.log("[POST] Found image files in zip:", imageFiles.length);
 
     // Select first image as cover
-    const coverImage = imageFiles[0];
+    const coverImage =
+      imageFiles[Math.floor(Math.random() * imageFiles.length)];
     const imageBuffer = await coverImage.async("nodebuffer");
     // Upload the cover image to S3 with consistent name
     const extension = coverImage.name.split(".").pop();

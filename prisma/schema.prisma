@@ -120,6 +120,7 @@ enum ModelStatus {
   READY         // Model ready for custom prompts
   FAILED        // Training or generation failed
   EXPIRED       // Collection has expired
+  CANCELLED     // Training was cancelled
 }
 
 model Account {

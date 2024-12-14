@@ -13,7 +13,7 @@ const publicModels = [
     id: "white-women",
     title: "Professional White Woman",
     photoCount: 50,
-    thumbnail: "/examples/white-woman.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2",
     date: "Featured Model",
     status: "ready" as const,
   },
@@ -21,7 +21,7 @@ const publicModels = [
     id: "asian-women",
     title: "Professional Asian Woman",
     photoCount: 50,
-    thumbnail: "/examples/asian-woman.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1601288496920-b6154fe3626a",
     date: "Featured Model",
     status: "ready" as const,
   },
@@ -29,7 +29,7 @@ const publicModels = [
     id: "black-women",
     title: "Professional Black Woman",
     photoCount: 50,
-    thumbnail: "/examples/black-woman.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e",
     date: "Featured Model",
     status: "ready" as const,
   },
@@ -37,7 +37,7 @@ const publicModels = [
     id: "white-man",
     title: "Professional White Man",
     photoCount: 50,
-    thumbnail: "/examples/white-man.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1560250097-0b93528c311a",
     date: "Featured Model",
     status: "ready" as const,
   },
@@ -45,7 +45,7 @@ const publicModels = [
     id: "asian-man",
     title: "Professional Asian Man",
     photoCount: 50,
-    thumbnail: "/examples/asian-man.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d",
     date: "Featured Model",
     status: "ready" as const,
   },
@@ -53,7 +53,7 @@ const publicModels = [
     id: "black-man",
     title: "Professional Black Man",
     photoCount: 50,
-    thumbnail: "/examples/black-man.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
     date: "Featured Model",
     status: "ready" as const,
   },
@@ -238,7 +238,7 @@ export default function AppPage() {
           )}
 
           {/* Public Example Models */}
-          {/* <div className="pt-12 border-t border-gray-800">
+          <div className="pt-12 border-t border-gray-800">
             <div className="space-y-6">
               <div className="space-y-2">
                 <h2 className="text-xl md:text-2xl font-semibold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
@@ -251,7 +251,7 @@ export default function AppPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {publicModels.map((model) => (
-                  <GalleryCard
+                  <ModelCard
                     key={model.id}
                     title={model.title}
                     photoCount={model.photoCount}
@@ -262,7 +262,7 @@ export default function AppPage() {
                 ))}
               </div>
             </div>
-          </div> */}
+          </div>
         </div>
       </div>
     </div>
