@@ -117,7 +117,7 @@ export default function GeneratePage({
         {/* Model Info */}
         {model.coverImage && (
           <div className="flex items-center gap-3 p-4 border-b border-gray-800">
-            <div className="relative h-12 w-12 rounded-lg overflow-hidden">
+            <div className="relative h-14 w-14 rounded-lg overflow-hidden">
               <img
                 src={model.coverImage}
                 alt={model.title}
@@ -126,15 +126,46 @@ export default function GeneratePage({
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-sm text-gray-400">Model:</span>
-                <h2 className="text-base font-medium text-white">
+                <span className="text-base text-gray-400">Model:</span>
+                <h2 className="text-lg font-medium text-white">
                   {model.title}
                 </h2>
               </div>
-              <p className="text-xs text-gray-400">{model.fullName}</p>
+              <p className="text-sm text-gray-400">{model.fullName}</p>
             </div>
           </div>
         )}
+
+        {/* Upgrade Prompt */}
+        <div className="px-4 py-3 border-b border-gray-800 bg-gray-900/50">
+          <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4">
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-2">
+                <div className="flex -space-x-1">
+                  <div className="h-5 w-5 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-[10px] shadow-lg">
+                    ✨
+                  </div>
+                </div>
+                <h3 className="text-base font-medium text-red-400">
+                  You're out of credits
+                </h3>
+              </div>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Upgrade to a higher plan and get more credits instantly.
+                Immediately continue taking more photos after upgrading your
+                plan, click the button below to go the billing portal.
+              </p>
+              <Button
+                className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/30"
+                size="default"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-base">Update Plan</span>
+                </div>
+              </Button>
+            </div>
+          </div>
+        </div>
 
         {/* Scrollable Content */}
         <div className="flex-1 p-6 space-y-8 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-900 [&::-webkit-scrollbar-thumb]:bg-gray-800">
@@ -575,29 +606,26 @@ export default function GeneratePage({
             <TabsList className="bg-transparent relative space-x-6 my-2">
               <TabsTrigger
                 value="generated"
-                className="relative px-4 py-2 text-base font-medium data-[state=active]:bg-transparent data-[state=active]:text-white text-gray-400 hover:text-gray-200 data-[state=active]:after:absolute data-[state=active]:after:bottom-[-1px] data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-[2px] data-[state=active]:after:bg-blue-400 transition-all duration-200 hover:scale-105 active:scale-95"
+                className="relative px-4 py-2 text-lg font-medium data-[state=active]:bg-transparent data-[state=active]:text-white text-gray-400 hover:text-gray-200 data-[state=active]:after:absolute data-[state=active]:after:bottom-[-1px] data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-[2px] data-[state=active]:after:bg-blue-400 transition-all duration-200 hover:scale-105 active:scale-95"
               >
                 <div className="flex items-center gap-2">
-                  <ImageIcon className="h-5 w-5" />
-                  <span>Generated</span>
+                  <span>✨ Generated</span>
                 </div>
               </TabsTrigger>
               <TabsTrigger
                 value="saved"
-                className="relative px-4 py-2 text-base font-medium data-[state=active]:bg-transparent data-[state=active]:text-white text-gray-400 hover:text-gray-200 data-[state=active]:after:absolute data-[state=active]:after:bottom-[-1px] data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-[2px] data-[state=active]:after:bg-blue-400"
+                className="relative px-4 py-2 text-lg font-medium data-[state=active]:bg-transparent data-[state=active]:text-white text-gray-400 hover:text-gray-200 data-[state=active]:after:absolute data-[state=active]:after:bottom-[-1px] data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-[2px] data-[state=active]:after:bg-blue-400"
               >
                 <div className="flex items-center gap-2">
-                  <Save className="h-5 w-5" />
-                  <span>Saved</span>
+                  <span>💾 Saved</span>
                 </div>
               </TabsTrigger>
               <TabsTrigger
                 value="examples"
-                className="relative px-4 py-2 text-base font-medium data-[state=active]:bg-transparent data-[state=active]:text-white text-gray-400 hover:text-gray-200 data-[state=active]:after:absolute data-[state=active]:after:bottom-[-1px] data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-[2px] data-[state=active]:after:bg-blue-400"
+                className="relative px-4 py-2 text-lg font-medium data-[state=active]:bg-transparent data-[state=active]:text-white text-gray-400 hover:text-gray-200 data-[state=active]:after:absolute data-[state=active]:after:bottom-[-1px] data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-[2px] data-[state=active]:after:bg-blue-400"
               >
                 <div className="flex items-center gap-2">
-                  <BookMarked className="h-5 w-5" />
-                  <span>Examples</span>
+                  <span>🎯 Examples</span>
                 </div>
               </TabsTrigger>
             </TabsList>
