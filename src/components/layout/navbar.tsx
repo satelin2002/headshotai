@@ -26,8 +26,8 @@ function LanguageDisplay({ value }: { value: string }) {
   const language = languages.find((lang) => lang.value === value);
   return (
     <span className="flex items-center gap-2">
-      <span className="text-sm font-medium">{value.toUpperCase()}</span>
-      <span className="text-muted-foreground text-sm">{language?.label}</span>
+      <span className="text-base font-medium">{value.toUpperCase()}</span>
+      <span className="text-muted-foreground text-base">{language?.label}</span>
     </span>
   );
 }
@@ -45,7 +45,7 @@ export function Navbar() {
               height={28}
               className="shrink-0"
             />
-            <TypographyLarge className="font-semibold hidden sm:block text-white">
+            <TypographyLarge className="font-semibold hidden sm:block text-white text-base">
               HeadshotPro
             </TypographyLarge>
           </Link>
@@ -54,24 +54,29 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 text-gray-300 hover:text-white hover:bg-gray-800/80 transition-colors"
+              className="h-9 text-gray-300 hover:text-white hover:bg-gray-800/80 transition-colors text-base"
             >
               <Globe className="h-4 w-4" />
-              <span className="hidden sm:inline font-medium">Support</span>
+              <span className="hidden sm:inline font-medium text-base">
+                Support
+              </span>
             </Button>
 
             <div className="h-5 w-px bg-gray-800" />
 
             <Select defaultValue="en">
-              <SelectTrigger className="w-[170px] h-9 bg-gray-900/90 border-gray-800 text-gray-300 hover:bg-gray-800/80 transition-colors">
-                <SelectValue placeholder="Select language" />
+              <SelectTrigger className="w-[170px] h-9 bg-gray-900/90 border-gray-800 text-gray-300 hover:bg-gray-800/80 transition-colors text-base">
+                <SelectValue
+                  placeholder="Select language"
+                  className="text-base"
+                />
               </SelectTrigger>
               <SelectContent className="bg-gray-900 border-gray-800">
                 {languages.map((lang) => (
                   <SelectItem
                     key={lang.value}
                     value={lang.value}
-                    className="text-gray-300 hover:text-white focus:text-white focus:bg-gray-800/80 transition-colors"
+                    className="text-gray-300 hover:text-white focus:text-white focus:bg-gray-800/80 transition-colors text-base"
                   >
                     <LanguageDisplay value={lang.value} />
                   </SelectItem>
@@ -91,10 +96,12 @@ export function Navbar() {
                   redirectTo: "/login",
                 })
               }
-              className="h-9 text-gray-300 hover:text-white hover:bg-gray-800/80 transition-colors"
+              className="h-9 text-gray-300 hover:text-white hover:bg-gray-800/80 transition-colors text-base"
             >
               <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline font-medium">Logout</span>
+              <span className="hidden sm:inline font-medium text-base">
+                Logout
+              </span>
             </Button>
           </div>
         </div>

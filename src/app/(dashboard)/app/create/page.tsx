@@ -11,7 +11,9 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import {
+  ArrowRight,
   CloudUpload,
+  EthernetPort,
   Image as ImageIcon,
   Loader2,
   Sparkles,
@@ -333,7 +335,7 @@ export default function CreateModelPage() {
             <div className="space-y-2">
               <Label
                 htmlFor="name"
-                className="text-gray-200 flex items-center gap-1"
+                className="text-sm font-semibold text-gray-200 uppercase tracking-wide flex items-center gap-1"
               >
                 Model Name
                 <span className="text-red-400">*</span>
@@ -346,7 +348,7 @@ export default function CreateModelPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Professional Headshots 2024"
-                className="bg-gray-900 border-gray-800 text-white"
+                className="bg-gray-900 border-gray-700 hover:border-gray-500 focus:border-gray-400 text-white transition-colors text-[16px] h-[52px] px-4 py-3"
                 disabled={isSubmitting}
               />
               {titleError && (
@@ -357,7 +359,7 @@ export default function CreateModelPage() {
             <div className="space-y-2">
               <Label
                 htmlFor="fullName"
-                className="text-gray-200 flex items-center gap-1"
+                className="text-sm font-semibold text-gray-200 uppercase tracking-wide flex items-center gap-1"
               >
                 Full Name
                 <span className="text-red-400">*</span>
@@ -367,14 +369,14 @@ export default function CreateModelPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Your full name"
-                className="bg-gray-900 border-gray-800 text-white"
+                className="bg-gray-900 border-gray-700 hover:border-gray-500 focus:border-gray-400 text-white transition-colors text-[16px] h-[52px] px-4 py-3"
                 disabled={isSubmitting}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label className="text-gray-200">
+                <Label className="text-sm font-semibold text-gray-200 uppercase tracking-wide flex items-center gap-1">
                   Gender
                   <span className="text-red-400">*</span>
                 </Label>
@@ -383,37 +385,37 @@ export default function CreateModelPage() {
                   onValueChange={setGender}
                   disabled={isSubmitting}
                 >
-                  <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
+                  <SelectTrigger className="bg-gray-900 border-gray-700 hover:border-gray-500 focus:border-gray-400 text-white transition-colors text-[16px] h-[52px] px-4 py-3">
                     <SelectValue
                       placeholder="Select gender"
-                      className="text-gray-400"
+                      className="text-gray-400 text-[16px]"
                     />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-900 border-gray-800">
+                  <SelectContent className="bg-gray-950 border border-gray-800">
                     <SelectItem
                       value="man"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
+                      className="py-3 px-4 text-white hover:text-black bg-gray-900 hover:bg-white hover:border hover:border-black transition-all duration-200"
                     >
-                      Man
+                      👨 Man
                     </SelectItem>
                     <SelectItem
                       value="woman"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
+                      className="py-3 px-4 text-white hover:text-black bg-gray-900 hover:bg-white hover:border hover:border-black transition-all duration-200"
                     >
-                      Woman
+                      👩 Woman
                     </SelectItem>
                     <SelectItem
                       value="other"
-                      className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
+                      className="py-3 px-4 text-white hover:text-black bg-gray-900 hover:bg-white hover:border hover:border-black transition-all duration-200"
                     >
-                      Other
+                      🧑 Other
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-gray-200">
+                <Label className="text-sm font-semibold text-gray-200 uppercase tracking-wide flex items-center gap-1">
                   Ethnicity
                   <span className="text-red-400">*</span>
                 </Label>
@@ -422,18 +424,18 @@ export default function CreateModelPage() {
                   onValueChange={setEthnicity}
                   disabled={isSubmitting}
                 >
-                  <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
+                  <SelectTrigger className="bg-gray-900 border-gray-700 hover:border-gray-500 focus:border-gray-400 text-white transition-colors text-[16px] h-[52px] px-4 py-3">
                     <SelectValue
                       placeholder="Select ethnicity"
-                      className="text-gray-400"
+                      className="text-gray-400 text-[16px]"
                     />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-900 border-gray-800">
+                  <SelectContent className="bg-gray-950 border border-gray-800">
                     {ETHNICITIES.map((item) => (
                       <SelectItem
                         key={item.value}
                         value={item.value}
-                        className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
+                        className="py-3 px-4 text-white hover:text-black bg-gray-900 hover:bg-white hover:border hover:border-black transition-all duration-200"
                       >
                         {item.label}
                       </SelectItem>
@@ -443,7 +445,7 @@ export default function CreateModelPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-gray-200">
+                <Label className="text-sm font-semibold text-gray-200 uppercase tracking-wide flex items-center gap-1">
                   Eye Color
                   <span className="text-red-400">*</span>
                 </Label>
@@ -452,18 +454,18 @@ export default function CreateModelPage() {
                   onValueChange={setEyeColor}
                   disabled={isSubmitting}
                 >
-                  <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
+                  <SelectTrigger className="bg-gray-900 border-gray-700 hover:border-gray-500 focus:border-gray-400 text-white transition-colors text-[16px] h-[52px] px-4 py-3">
                     <SelectValue
                       placeholder="Select eye color"
-                      className="text-gray-400"
+                      className="text-gray-400 text-[16px]"
                     />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-900 border-gray-800">
+                  <SelectContent className="bg-gray-950 border border-gray-800">
                     {EYE_COLORS.map((color) => (
                       <SelectItem
                         key={color}
                         value={color}
-                        className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
+                        className="py-3 px-4 text-white hover:text-black bg-gray-900 hover:bg-white hover:border hover:border-black transition-all duration-200"
                       >
                         {color.charAt(0).toUpperCase() + color.slice(1)}
                       </SelectItem>
@@ -473,7 +475,7 @@ export default function CreateModelPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-gray-200">
+                <Label className="text-sm font-semibold text-gray-200 uppercase tracking-wide flex items-center gap-1">
                   Hair Color
                   <span className="text-red-400">*</span>
                 </Label>
@@ -482,18 +484,18 @@ export default function CreateModelPage() {
                   onValueChange={setHairColor}
                   disabled={isSubmitting}
                 >
-                  <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
+                  <SelectTrigger className="bg-gray-900 border-gray-700 hover:border-gray-500 focus:border-gray-400 text-white transition-colors text-[16px] h-[52px] px-4 py-3">
                     <SelectValue
                       placeholder="Select hair color"
-                      className="text-gray-400"
+                      className="text-gray-400 text-[16px]"
                     />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-900 border-gray-800">
+                  <SelectContent className="bg-gray-950 border border-gray-800">
                     {HAIR_COLORS.map((color) => (
                       <SelectItem
                         key={color}
                         value={color}
-                        className="text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900"
+                        className="py-3 px-4 text-white hover:text-black bg-gray-900 hover:bg-white hover:border hover:border-black transition-all duration-200"
                       >
                         {color.charAt(0).toUpperCase() +
                           color.slice(1).replace("-", " ")}
@@ -504,10 +506,10 @@ export default function CreateModelPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-gray-200">
+                <Label className="text-sm font-semibold text-gray-200 uppercase tracking-wide flex items-center gap-1">
                   Age
                   <span className="text-red-400">*</span>
-                  <span className="text-xs text-gray-400 ml-2">
+                  <span className="text-xs text-gray-400 ml-2 normal-case tracking-normal">
                     (18 or above)
                   </span>
                 </Label>
@@ -518,7 +520,7 @@ export default function CreateModelPage() {
                     onChange={handleAgeChange}
                     max={100}
                     className={cn(
-                      "bg-gray-900 border-gray-800 text-white",
+                      "bg-gray-900 border-gray-700 hover:border-gray-500 focus:border-gray-400 text-white transition-colors text-[16px] h-[52px] px-4 py-3",
                       ageError && "border-red-500/50 focus:border-red-500"
                     )}
                     disabled={isSubmitting}
@@ -538,7 +540,7 @@ export default function CreateModelPage() {
           {/* Photo Upload Section */}
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label className="text-gray-200">
+              <Label className="text-sm font-semibold text-gray-200 uppercase tracking-wide flex items-center gap-1">
                 Upload Photos
                 <span className="text-red-400">*</span>
               </Label>
@@ -716,7 +718,7 @@ export default function CreateModelPage() {
             <form onSubmit={handleSubmit} className="space-y-8">
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-400/90 via-violet-400/90 to-fuchsia-400/90 hover:from-blue-500/90 hover:via-violet-500/90 hover:to-fuchsia-500/90 text-white font-medium h-11"
+                className="relative w-full h-14 bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 text-white font-semibold text-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(76,29,149,0.2)] hover:shadow-[0_0_25px_rgba(76,29,149,0.3)] overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 disabled={
                   isSubmitting ||
                   photos.length < 12 ||
@@ -729,15 +731,17 @@ export default function CreateModelPage() {
                   age < 18
                 }
               >
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/50 via-violet-600/50 to-fuchsia-600/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Creating Model (this will take a few seconds)...
+                  <div className="relative flex items-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span className="text-lg font-semibold">
+                      Creating Model...
+                    </span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4" />
-                    Create Model
+                  <div className="relative flex items-center justify-center gap-2">
+                    <span className="text-lg font-semibold">Create Model</span>
                   </div>
                 )}
               </Button>

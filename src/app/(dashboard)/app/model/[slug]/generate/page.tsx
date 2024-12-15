@@ -610,6 +610,33 @@ export default function GeneratePage({
                   <option value="polaroid" className="py-2">
                     📷 Polaroid
                   </option>
+                  <option value="vintage" className="py-2">
+                    🕰️ Vintage
+                  </option>
+                  <option value="black-and-white" className="py-2">
+                    ⚫️ Black & White
+                  </option>
+                  <option value="analog" className="py-2">
+                    📼 Analog
+                  </option>
+                  <option value="futuristic" className="py-2">
+                    🚀 Futuristic
+                  </option>
+                  <option value="retro" className="py-2">
+                    🌈 Retro
+                  </option>
+                  <option value="documentary" className="py-2">
+                    🎥 Documentary
+                  </option>
+                  <option value="editorial" className="py-2">
+                    📰 Editorial
+                  </option>
+                  <option value="glamour" className="py-2">
+                    ✨ Glamour
+                  </option>
+                  <option value="minimalist" className="py-2">
+                    ⬜️ Minimalist
+                  </option>
                 </select>
               </div>
 
@@ -653,11 +680,41 @@ export default function GeneratePage({
                   <option value="confident" className="py-2">
                     💪 Confident
                   </option>
-                  <option value="scared" className="py-2">
-                    🫣 Scared
+                  <option value="thoughtful" className="py-2">
+                    🤔 Thoughtful
                   </option>
-                  <option value="surprised" className="py-2">
-                    😮 Surprised
+                  <option value="peaceful" className="py-2">
+                    😌 Peaceful
+                  </option>
+                  <option value="energetic" className="py-2">
+                    ⚡️ Energetic
+                  </option>
+                  <option value="mysterious" className="py-2">
+                    🎭 Mysterious
+                  </option>
+                  <option value="playful" className="py-2">
+                    😋 Playful
+                  </option>
+                  <option value="determined" className="py-2">
+                    😤 Determined
+                  </option>
+                  <option value="friendly" className="py-2">
+                    🤗 Friendly
+                  </option>
+                  <option value="relaxed" className="py-2">
+                    😎 Relaxed
+                  </option>
+                  <option value="focused" className="py-2">
+                    🎯 Focused
+                  </option>
+                  <option value="dreamy" className="py-2">
+                    😴 Dreamy
+                  </option>
+                  <option value="elegant" className="py-2">
+                    👑 Elegant
+                  </option>
+                  <option value="fierce" className="py-2">
+                    😈 Fierce
                   </option>
                 </select>
               </div>
@@ -702,11 +759,35 @@ export default function GeneratePage({
                   <option value="side" className="py-2">
                     👥 Side View
                   </option>
+                  <option value="profile" className="py-2">
+                    👤 Profile Shot
+                  </option>
+                  <option value="three-quarter" className="py-2">
+                    👤 Three-Quarter View
+                  </option>
                   <option value="above" className="py-2">
                     ⬇️ From Above
                   </option>
                   <option value="below" className="py-2">
                     ⬆️ From Below
+                  </option>
+                  <option value="close-up" className="py-2">
+                    🔍 Close-Up
+                  </option>
+                  <option value="full-body" className="py-2">
+                    👤 Full Body
+                  </option>
+                  <option value="waist-up" className="py-2">
+                    👤 Waist Up
+                  </option>
+                  <option value="shoulders-up" className="py-2">
+                    👤 Shoulders Up
+                  </option>
+                  <option value="candid" className="py-2">
+                    📸 Candid Shot
+                  </option>
+                  <option value="dutch-angle" className="py-2">
+                    ↗️ Dutch Angle
                   </option>
                 </select>
               </div>
@@ -740,7 +821,7 @@ export default function GeneratePage({
                     Select place
                   </option>
                   <option value="studio" className="py-2">
-                    ���� Studio
+                    📷 Studio
                   </option>
                   <option value="outdoor" className="py-2">
                     🌳 Outdoor
